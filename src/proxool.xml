@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proxool-config>
+	<proxool>
+		<alias>myapp</alias>
+		<driver-url>jdbc:mysql://127.0.0.1:3306/test</driver-url>
+		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="root" />
+			<property name="password" value="root" />
+		</driver-properties>
+		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
+		<maximum-connection-count>50</maximum-connection-count>
+		<minimum-connection-count>1</minimum-connection-count>
+		<prototype-count>1</prototype-count>
+		<simultaneous-build-throttle>100</simultaneous-build-throttle>
+		<statistics>10m,1h,1d</statistics>
+		<statistics-log-level>INFO</statistics-log-level>
+	</proxool>
+
+	<proxool>
+		<alias>myapp2</alias>
+		<driver-url>jdbc:mysql://10.15.62.59:3306/userinfo</driver-url>
+		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="root" />
+			<property name="password" value="root" />
+		</driver-properties>
+		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
+		<maximum-connection-count>50</maximum-connection-count>
+		<minimum-connection-count>1</minimum-connection-count>
+		<prototype-count>1</prototype-count>
+		<simultaneous-build-throttle>100</simultaneous-build-throttle>
+		<statistics>10m,1h,1d</statistics>
+		<statistics-log-level>INFO</statistics-log-level>
+	</proxool>
+</proxool-config>
