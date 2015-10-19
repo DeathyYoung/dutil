@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 
+import com.deathyyoung.common.util.SecurityUtil;
 import com.deathyyoung.jdbc.bean.ColumnType;
 
 /**
@@ -260,6 +261,7 @@ public class JDBCUtil {
 	 * @return 字段名称
 	 */
 	public String[] getColumnNames(String sql, Object... objs) {
+		sql = SecurityUtil.xssFilter(sql);
 		String[] columnNames = null;
 		open();
 		try {
@@ -295,6 +297,7 @@ public class JDBCUtil {
 	 * @return 字段类型
 	 */
 	public ColumnType[] getColumnTypes(String sql, Object... objs) {
+		sql = SecurityUtil.xssFilter(sql);
 		ColumnType[] columnTypes = null;
 		open();
 		try {
@@ -329,6 +332,7 @@ public class JDBCUtil {
 	 * @return 预处理语句对象
 	 */
 	public PreparedStatement prepareStatement(String sql) {
+		sql = SecurityUtil.xssFilter(sql);
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -448,6 +452,7 @@ public class JDBCUtil {
 	 */
 	public boolean loadFromDatabase(String sql, String filePath,
 			String blobColumnName, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		FileOutputStream output = null;
 		open();
 		try {
@@ -537,6 +542,7 @@ public class JDBCUtil {
 	 */
 	public LinkedList<String[]> executeQueryPagingToString(String sql,
 			String page, int perCount, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		return executeQueryPagingToString(sql, Integer.parseInt(page),
 				perCount, obj);
 	}
@@ -553,6 +559,7 @@ public class JDBCUtil {
 	 */
 	public LinkedList<String[]> executeQueryPagingToString(String sql,
 			int page, int perCount, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		LinkedList<String[]> aList = executeQueryToStrings(sql, obj);
 
 		String[] infos = new String[4];
@@ -669,6 +676,7 @@ public class JDBCUtil {
 	 * @return 影响的行数
 	 */
 	public int execute(String sql, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		line = -1;
 		open();
 		try {
@@ -703,6 +711,7 @@ public class JDBCUtil {
 	 */
 	public LinkedList<Map<String, Object>> executeQuery(String sql,
 			Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		LinkedList<Map<String, Object>> aList = new LinkedList<Map<String, Object>>();
 		open();
 		try {
@@ -779,6 +788,7 @@ public class JDBCUtil {
 	 * @return 查询结果
 	 */
 	public LinkedList<String[]> executeQueryToStrings(String sql, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		LinkedList<String[]> aList = new LinkedList<String[]>();
 		open();
 		try {
@@ -823,6 +833,7 @@ public class JDBCUtil {
 	 * @return 影响的行数
 	 */
 	public int executeUpdate(String sql, Object... obj) {
+		sql = SecurityUtil.xssFilter(sql);
 		line = -1;
 		open();
 		try {
@@ -854,6 +865,7 @@ public class JDBCUtil {
 	 *            语句
 	 */
 	public void addBatch(String sql) {
+		sql = SecurityUtil.xssFilter(sql);
 		try {
 			pstmt.addBatch(sql);
 		} catch (SQLException e) {
@@ -897,6 +909,7 @@ public class JDBCUtil {
 	 */
 	public int[] executeBatch(String sql, int valueNumber,
 			LinkedList<Object> values) {
+		sql = SecurityUtil.xssFilter(sql);
 		lines = null;
 		try {
 			open();
