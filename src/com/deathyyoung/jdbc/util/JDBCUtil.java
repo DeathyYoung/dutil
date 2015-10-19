@@ -128,7 +128,7 @@ public class JDBCUtil {
 	 */
 	private int[] lines;
 
-	public JDBCUtil() {
+	public JDBCUtil(String alias) {
 		pstmt = null;
 		rs = null;
 		line = 0;
@@ -140,7 +140,7 @@ public class JDBCUtil {
 			System.out.println("未找到配置文件！！！");
 		}
 		pool = POOL.valueOf(pro.getProperty("pool"));
-		alias = pro.getProperty("alias");
+		this.alias = alias;
 		try {
 			switch (pool) {
 			case NONE:
@@ -261,12 +261,14 @@ public class JDBCUtil {
 	 * @return 字段名称
 	 */
 	public String[] getColumnNames(String sql, Object... objs) {
-		sql = SecurityUtil.xssFilter(sql);
 		String[] columnNames = null;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
@@ -297,12 +299,14 @@ public class JDBCUtil {
 	 * @return 字段类型
 	 */
 	public ColumnType[] getColumnTypes(String sql, Object... objs) {
-		sql = SecurityUtil.xssFilter(sql);
 		ColumnType[] columnTypes = null;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
@@ -332,7 +336,6 @@ public class JDBCUtil {
 	 * @return 预处理语句对象
 	 */
 	public PreparedStatement prepareStatement(String sql) {
-		sql = SecurityUtil.xssFilter(sql);
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -447,18 +450,20 @@ public class JDBCUtil {
 	 *            　
 	 * @param filePath
 	 * @param blobColumnName
-	 * @param obj
+	 * @param objs
 	 * @return　是否提取成功
 	 */
 	public boolean loadFromDatabase(String sql, String filePath,
-			String blobColumnName, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
+			String blobColumnName, Object... objs) {
 		FileOutputStream output = null;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < obj.length; i++) {
-				pstmt.setObject(i + 1, obj[i]);
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
+				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -542,7 +547,6 @@ public class JDBCUtil {
 	 */
 	public LinkedList<String[]> executeQueryPagingToString(String sql,
 			String page, int perCount, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
 		return executeQueryPagingToString(sql, Integer.parseInt(page),
 				perCount, obj);
 	}
@@ -559,7 +563,6 @@ public class JDBCUtil {
 	 */
 	public LinkedList<String[]> executeQueryPagingToString(String sql,
 			int page, int perCount, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
 		LinkedList<String[]> aList = executeQueryToStrings(sql, obj);
 
 		String[] infos = new String[4];
@@ -582,6 +585,9 @@ public class JDBCUtil {
 		try {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
@@ -671,24 +677,26 @@ public class JDBCUtil {
 	 *
 	 * @param sql
 	 *            预处理语句
-	 * @param obj
+	 * @param objs
 	 *            参数值
 	 * @return 影响的行数
 	 */
-	public int execute(String sql, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
+	public int execute(String sql, Object... objs) {
 		line = -1;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < obj.length; i++) {
-				if (obj[i] != null && obj[i] instanceof File) {
-					File file = (File) obj[i];
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof File) {
+					File file = (File) objs[i];
 					pstmt.setBinaryStream(i + 1, new DataInputStream(
 							new FileInputStream(file)), (int) file.length());
 					continue;
+				} else if (objs[i] != null
+						&& objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
 				}
-				pstmt.setObject(i + 1, obj[i]);
+				pstmt.setObject(i + 1, objs[i]);
 			}
 			line = pstmt.executeUpdate();
 		} catch (SQLException e) {
@@ -705,19 +713,21 @@ public class JDBCUtil {
 	 *
 	 * @param sql
 	 *            预处理语句
-	 * @param obj
+	 * @param objs
 	 *            参数值
 	 * @return 查询结果
 	 */
 	public LinkedList<Map<String, Object>> executeQuery(String sql,
-			Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
+			Object... objs) {
 		LinkedList<Map<String, Object>> aList = new LinkedList<Map<String, Object>>();
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < obj.length; i++) {
-				pstmt.setObject(i + 1, obj[i]);
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
+				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -783,18 +793,21 @@ public class JDBCUtil {
 	 *
 	 * @param sql
 	 *            预处理语句
-	 * @param obj
+	 * @param objs
 	 *            参数值
 	 * @return 查询结果
 	 */
-	public LinkedList<String[]> executeQueryToStrings(String sql, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
+	public LinkedList<String[]> executeQueryToStrings(String sql,
+			Object... objs) {
 		LinkedList<String[]> aList = new LinkedList<String[]>();
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < obj.length; i++) {
-				pstmt.setObject(i + 1, obj[i]);
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+				}
+				pstmt.setObject(i + 1, objs[i]);
 			}
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -828,24 +841,26 @@ public class JDBCUtil {
 	 *
 	 * @param sql
 	 *            预处理语句
-	 * @param obj
+	 * @param objs
 	 *            参数值
 	 * @return 影响的行数
 	 */
-	public int executeUpdate(String sql, Object... obj) {
-		sql = SecurityUtil.xssFilter(sql);
+	public int executeUpdate(String sql, Object... objs) {
 		line = -1;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
-			for (int i = 0; i < obj.length; i++) {
-				if (obj[i] != null && obj[i] instanceof File) {
-					File file = (File) obj[i];
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i] != null && objs[i] instanceof File) {
+					File file = (File) objs[i];
 					pstmt.setBinaryStream(i + 1, new DataInputStream(
 							new FileInputStream(file)), (int) file.length());
 					continue;
+				} else if (objs[i] != null
+						&& objs[i] instanceof java.lang.String) {
+					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
 				}
-				pstmt.setObject(i + 1, obj[i]);
+				pstmt.setObject(i + 1, objs[i]);
 			}
 			line = pstmt.executeUpdate();
 			pstmt.close();
@@ -865,7 +880,6 @@ public class JDBCUtil {
 	 *            语句
 	 */
 	public void addBatch(String sql) {
-		sql = SecurityUtil.xssFilter(sql);
 		try {
 			pstmt.addBatch(sql);
 		} catch (SQLException e) {
@@ -909,13 +923,17 @@ public class JDBCUtil {
 	 */
 	public int[] executeBatch(String sql, int valueNumber,
 			LinkedList<Object> values) {
-		sql = SecurityUtil.xssFilter(sql);
 		lines = null;
 		try {
 			open();
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < values.size(); i = i + valueNumber) {
 				for (int j = 0; j < valueNumber; j++) {
+					if (values.get(i + j) != null
+							&& values.get(i + j) instanceof java.lang.String) {
+						values.set(i + j, SecurityUtil.xssFilter(values.get(
+								i + j).toString()));
+					}
 					pstmt.setObject(j + 1, values.get(i + j));
 				}
 				pstmt.addBatch();

@@ -41,7 +41,7 @@ public class JDBCFactory {
 		JDBCUtil ju = null;
 		ju = jdbcMap.get(alias);
 		if (ju == null || ju.isConnClosed()) {
-			ju = new JDBCUtil();
+			ju = new JDBCUtil(alias);
 			jdbcMap.put(alias, ju);
 			return ju;
 		}

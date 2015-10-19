@@ -7,7 +7,7 @@ import com.deathyyoung.jdbc.util.JDBCUtil;
 
 public class Test {
 	public static void main(String[] args) {
-		JDBCUtil ju = new JDBCUtil();
+		JDBCUtil ju = new JDBCUtil("test");
 
 		// 遍历
 		String sql = "select * from userinfo";
@@ -19,7 +19,7 @@ public class Test {
 		}
 		//插入
 		int newId = 3;
-		String newUsername = "candy";
+		String newUsername = "candy2";
 		
 		sql = "insert userinfo values (?, ?)";
 		ju.execute(sql, newId, newUsername);

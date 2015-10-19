@@ -344,5 +344,4 @@ public class SecurityUtil {
 		}
 		return new String(result);
 	}
-
 }
