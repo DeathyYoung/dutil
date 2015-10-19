@@ -2,13 +2,13 @@
 <c3p0-config>
 	<default-config>
 		<!--用户名。Default: null -->
-		<property name="user">deathyblog</property>
+		<property name="user">user</property>
 		<!--密码。Default: null -->
-		<property name="password">maple357</property>
+		<property name="password">password</property>
 		<!--连接数据库所用的 JDBC Driver Class。Default: null -->
 		<property name="driverClass">com.mysql.jdbc.Driver</property>
 		<!--响应驱动的jdbcUrl 。Default: null -->
-		<property name="jdbcUrl">jdbc:mysql://10.15.62.91:3306/test</property>
+		<property name="jdbcUrl">jdbc:mysql://127.0.0.1:3306/test</property>
 
 		<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
 		<property name="acquireIncrement">3</property>
@@ -37,10 +37,10 @@
 	</default-config>
 
 	<named-config name="test">
-		<property name="user">deathyblog</property>
-		<property name="password">maple357</property>
+		<property name="user">user</property>
+		<property name="password">password</property>
 		<property name="driverClass">com.mysql.jdbc.Driver</property>
-		<property name="jdbcUrl">jdbc:mysql://10.15.62.91:3306/test</property>
+		<property name="jdbcUrl">jdbc:mysql://127.0.0.1:3306/test</property>
 
 		<property name="acquireIncrement">3</property>
 		<property name="acquireRetryAttempts">30</property>
