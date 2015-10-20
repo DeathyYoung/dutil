@@ -267,7 +267,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -305,7 +305,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -461,7 +461,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -586,7 +586,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -694,7 +694,7 @@ public class JDBCUtil {
 					continue;
 				} else if (objs[i] != null
 						&& objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -725,7 +725,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -805,7 +805,7 @@ public class JDBCUtil {
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.length; i++) {
 				if (objs[i] != null && objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -858,7 +858,7 @@ public class JDBCUtil {
 					continue;
 				} else if (objs[i] != null
 						&& objs[i] instanceof java.lang.String) {
-					objs[i] = SecurityUtil.xssFilter(objs[i].toString());
+					objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 				}
 				pstmt.setObject(i + 1, objs[i]);
 			}
@@ -931,7 +931,7 @@ public class JDBCUtil {
 				for (int j = 0; j < valueNumber; j++) {
 					if (values.get(i + j) != null
 							&& values.get(i + j) instanceof java.lang.String) {
-						values.set(i + j, SecurityUtil.xssFilter(values.get(
+						values.set(i + j, SecurityUtil.sqlValueFilter(values.get(
 								i + j).toString()));
 					}
 					pstmt.setObject(j + 1, values.get(i + j));

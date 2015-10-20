@@ -147,4 +147,43 @@ public class StringUtil {
 		}
 		return "";
 	}
+
+	/**
+	 * <p>
+	 * byte to hex
+	 *
+	 * @param b
+	 *            bytes
+	 * @return hex
+	 */
+	public static String byte2hex(byte[] b) {
+		StringBuffer sb = new StringBuffer();
+		String stmp = "";
+		for (int n = 0; n < b.length; n++) {
+			stmp = Integer.toHexString(b[n] & 0XFF);
+			if (stmp.length() == 1) {
+				sb.append("0" + stmp);
+			} else {
+				sb.append(stmp);
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * <p>
+	 * whether the string is numeric
+	 *
+	 * @param str
+	 *            the string
+	 * @return result
+	 */
+	public static boolean isNumeric(String str) {
+		for (int i = str.length(); --i >= 0;) {
+			if (!Character.isDigit(str.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

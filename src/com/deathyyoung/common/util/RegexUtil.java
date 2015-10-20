@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
  * <p>
  * Regex Util
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy Young</a>
- *         (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Jun 23, 2015
  */
 public class RegexUtil {
@@ -30,60 +30,86 @@ public class RegexUtil {
 	public static final String sentPat = "。|；|;|!|！|(……)";
 
 	/**
-	* <p> Check whether the <code>content</code> is a float number. 
-	*
-	* @param content The string to be matched
-	* @return <code>true</code> if, and only if, the <code>content</code> is a float number. 
-	*/ 
+	 * <p>
+	 * Check whether the <code>content</code> is a float number.
+	 *
+	 * @param content
+	 *            The string to be matched
+	 * @return <code>true</code> if, and only if, the <code>content</code> is a
+	 *         float number.
+	 */
 	public static boolean matchFloat(String content) {
 		return matches(content, floatPat);
 	}
 
 	/**
-	* <p> Check whether the <code>content</code> is a percent number. 
-	*
-	* @param content The string to be matched
-	* @return <code>true</code> if, and only if, the <code>content</code> is a percent number. 
-	*/ 
+	 * <p>
+	 * Check whether the <code>content</code> is a percent number.
+	 *
+	 * @param content
+	 *            The string to be matched
+	 * @return <code>true</code> if, and only if, the <code>content</code> is a
+	 *         percent number.
+	 */
 	public static boolean matchesPercent(String content) {
 		return matches(content, percentPat);
 	}
 
 	/**
-	* <p> Check whether the <code>content</code> is Chinese. 
-	*
-	* @param content The string to be matched
-	* @return <code>true</code> if, and only if, the <code>content</code> is Chinese. 
-	*/ 
+	 * <p>
+	 * Check whether the <code>content</code> is Chinese.
+	 *
+	 * @param content
+	 *            The string to be matched
+	 * @return <code>true</code> if, and only if, the <code>content</code> is
+	 *         Chinese.
+	 */
 	public static boolean matchesChinese(String content) {
 		return matches(content, ChinesePat);
 	}
+
 	/**
-	* <p> Check whether the <code>content</code> matches the <code>pat</code>.
-	* @param content The string to be matched
-	* @param pat The expression to be compiled
-	* @return <code>true</code> if, and only if, the <code>content</code> matches the <code>pat</code>. 
-	*/ 
+	 * <p>
+	 * Check whether the <code>content</code> matches the <code>pat</code>.
+	 * 
+	 * @param content
+	 *            The string to be matched
+	 * @param pat
+	 *            The expression to be compiled
+	 * @return <code>true</code> if, and only if, the <code>content</code>
+	 *         matches the <code>pat</code>.
+	 */
 	public static boolean matches(String content, String pat) {
 		return Pattern.compile(pat).matcher(content).matches();
 	}
 
 	/**
-	* <p> Check whether the <code>content</code> matches the <code>pat</code>.
-	* @param content The character to be matched
-	* @param pat The expression to be compiled
-	* @return <code>true</code> if, and only if, the <code>content</code> matches the <code>pat</code>. 
-	*/ 
+	 * <p>
+	 * Check whether the <code>content</code> matches the <code>pat</code>.
+	 * 
+	 * @param content
+	 *            The character to be matched
+	 * @param pat
+	 *            The expression to be compiled
+	 * @return <code>true</code> if, and only if, the <code>content</code>
+	 *         matches the <code>pat</code>.
+	 */
 	public static boolean matches(char content, String pat) {
 		return Pattern.compile(pat).matcher(content + "").matches();
 	}
 
 	/**
-	* <p> Check whether there exists a subsequence of the <code>content</code> matches the <code>pat</code>.
-	* @param content The character to be matched
-	* @param pat The expression to be compiled
-	* @return <code>true</code> if, and only if, a subsequence of the <code>content</code> matches the <code>pat</code>. 
-	*/ 
+	 * <p>
+	 * Check whether there exists a subsequence of the <code>content</code>
+	 * matches the <code>pat</code>.
+	 * 
+	 * @param content
+	 *            The character to be matched
+	 * @param pat
+	 *            The expression to be compiled
+	 * @return <code>true</code> if, and only if, a subsequence of the
+	 *         <code>content</code> matches the <code>pat</code>.
+	 */
 	public static boolean find(String content, String pat) {
 		Matcher matcher = Pattern.compile(pat).matcher(content);
 		return matcher.find();
@@ -214,6 +240,49 @@ public class RegexUtil {
 		for (int i = 1; i < words.size(); i++) {
 			sb.append(splitWord);
 			sb.append(words.get(i));
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * <p>
+	 * 获得可以匹配正则表达式regex的正则表达式
+	 *
+	 * @param regex
+	 *            待匹配正则表达式
+	 * @return 正则表达式的正则表达式
+	 */
+	public static String regexToString(String regex) {
+		if (regex == null) {
+			return null;
+		}
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < regex.length(); i++) {
+			char c = regex.charAt(i);
+			switch (c) {
+			case '\\':
+			case '*':
+			case '+':
+			case '.':
+			case '[':
+			case ']':
+			case '|':
+			case '^':
+			case '$':
+			case '?':
+			case '{':
+			case '}':
+			case ',':
+			case '(':
+			case ')':
+			case '!':
+			case '<':
+				sb.append('\\');
+				sb.append(c);
+				break;
+			default:
+				sb.append(c);
+			}
 		}
 		return sb.toString();
 	}

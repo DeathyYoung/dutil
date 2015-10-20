@@ -10,10 +10,15 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.imageio.stream.ImageInputStream;
 
 /**
  * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
@@ -22,18 +27,37 @@ import java.util.Set;
  */
 public class FileUtil {
 
+	/** for Path Manipulation */
+	public static final String pathReg = "[a-zA-Z0-9-_:/\\\\]+";
+
+	/**
+	 * <p>
+	 * Wheter the <code>path</code> is valided.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return <code>true</code> if and only if the path is valided;<br>
+	 *         <code>false</code> otherwise
+	 */
+	public static boolean validPath(String path) {
+		// return validPath(path);
+		return !path.contains("..");
+	}
+
 	/**
 	 * <p>
 	 * Add the <code>content</code> to the target file.
 	 * 
 	 * @param content
-	 * @param targetFilePath
+	 * @param path
 	 * @return <code>true</code> if and only if the content is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String content, String targetFilePath) {
-		File targetFile = new File(targetFilePath);
+	public static boolean addToFile(String content, String path) {
+		if (!validPath(path))
+			return false;
+		File targetFile = new File(path);
 		return addToFile(content, targetFile);
 	}
 
@@ -42,13 +66,15 @@ public class FileUtil {
 	 * Add the <code>content</code> to the target file.
 	 * 
 	 * @param content
-	 * @param targetFilePath
+	 * @param path
 	 * @return <code>true</code> if and only if the content is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFileln(String content, String targetFilePath) {
-		File targetFile = new File(targetFilePath);
+	public static boolean addToFileln(String content, String path) {
+		if (!validPath(path))
+			return false;
+		File targetFile = new File(path);
 		return addToFileln(content, targetFile);
 	}
 
@@ -64,14 +90,16 @@ public class FileUtil {
 	 *            the beginning index, inclusive
 	 * @param endIndex
 	 *            the ending index, exclusive
-	 * @param targetFilePath
+	 * @param path
 	 * @return <code>true</code> if and only if the specified substring is added
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean addToFile(String[] contents, int beginIndex,
-			int endIndex, String targetFilePath) {
-		File targetFile = new File(targetFilePath);
+			int endIndex, String path) {
+		if (!validPath(path))
+			return false;
+		File targetFile = new File(path);
 		return addToFile(contents, beginIndex, endIndex, targetFile);
 	}
 
@@ -80,13 +108,15 @@ public class FileUtil {
 	 * Add the <code>contents</code> to the target file.
 	 * 
 	 * @param contents
-	 * @param targetFilePath
+	 * @param path
 	 * @return <code>true</code> if and only if the contents is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String[] contents, String targetFilePath) {
-		File targetFile = new File(targetFilePath);
+	public static boolean addToFile(String[] contents, String path) {
+		if (!validPath(path))
+			return false;
+		File targetFile = new File(path);
 		return addToFile(contents, targetFile);
 	}
 
@@ -101,14 +131,16 @@ public class FileUtil {
 	 *            the beginning index, inclusive
 	 * @param endIndex
 	 *            the ending index, exclusive
-	 * @param targetFilePath
+	 * @param path
 	 * @return <code>true</code> if and only if the specified substring is added
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean addToFileln(String[] contents, int beginIndex,
-			int endIndex, String targetFilePath) {
-		File targetFile = new File(targetFilePath);
+			int endIndex, String path) {
+		if (!validPath(path))
+			return false;
+		File targetFile = new File(path);
 		return addToFileln(contents, beginIndex, endIndex, targetFile);
 	}
 
@@ -123,17 +155,17 @@ public class FileUtil {
 	 *            the beginning index, inclusive
 	 * @param endIndex
 	 *            the ending index, exclusive
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the specified substring is added
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean addToFile(String[] contents, int beginIndex,
-			int endIndex, File targetFile) {
+			int endIndex, File file) {
 		try {
 			beginIndex = beginIndex < 0 ? 0 : beginIndex;
 			endIndex = endIndex > contents.length ? contents.length : endIndex;
-			FileWriter fw = new FileWriter(targetFile, true);
+			FileWriter fw = new FileWriter(file, true);
 			for (int i = beginIndex; i < endIndex; i++) {
 				fw.write(contents[i]);
 			}
@@ -156,13 +188,13 @@ public class FileUtil {
 	 * Add the <code>contents</code> to the target file.
 	 * 
 	 * @param contents
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the contents is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String[] contents, File targetFile) {
-		return addToFile(contents, 0, contents.length, targetFile);
+	public static boolean addToFile(String[] contents, File file) {
+		return addToFile(contents, 0, contents.length, file);
 	}
 
 	/**
@@ -170,14 +202,14 @@ public class FileUtil {
 	 * Add the <code>content</code> to the target file.
 	 * 
 	 * @param content
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the content is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String content, File targetFile) {
+	public static boolean addToFile(String content, File file) {
 		try {
-			FileWriter fw = new FileWriter(targetFile, true);
+			FileWriter fw = new FileWriter(file, true);
 			fw.write(content);
 			fw.close();
 		} catch (FileNotFoundException e) {
@@ -198,14 +230,14 @@ public class FileUtil {
 	 * Add the <code>content</code> to the target file.
 	 * 
 	 * @param content
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the content is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFileln(String content, File targetFile) {
+	public static boolean addToFileln(String content, File file) {
 		try {
-			FileWriter fw = new FileWriter(targetFile, true);
+			FileWriter fw = new FileWriter(file, true);
 			fw.write(content);
 			fw.write("\n");
 			fw.close();
@@ -227,13 +259,13 @@ public class FileUtil {
 	 * Add the <code>contents</code> to the target file.
 	 * 
 	 * @param contents
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the contents is added to the
 	 *         file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFileln(String[] contents, File targetFile) {
-		return addToFileln(contents, 0, contents.length, targetFile);
+	public static boolean addToFileln(String[] contents, File file) {
+		return addToFileln(contents, 0, contents.length, file);
 	}
 
 	/**
@@ -247,15 +279,15 @@ public class FileUtil {
 	 *            the beginning index, inclusive
 	 * @param endIndex
 	 *            the ending index, exclusive
-	 * @param targetFile
+	 * @param file
 	 * @return <code>true</code> if and only if the specified substring is added
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean addToFileln(String[] contents, int beginIndex,
-			int endIndex, File targetFile) {
+			int endIndex, File file) {
 		try {
-			FileWriter fw = new FileWriter(targetFile, true);
+			FileWriter fw = new FileWriter(file, true);
 			for (int i = beginIndex; i < endIndex; i++) {
 				fw.write(contents[i]);
 				fw.write("\n");
@@ -289,11 +321,11 @@ public class FileUtil {
 	 * <p>
 	 * Get a new string from the file.
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @return the content of the file
 	 */
-	public static String getString(String filePath) {
-		return getString(filePath, 0, Integer.MAX_VALUE);
+	public static String getString(String path) {
+		return getString(path, 0, Integer.MAX_VALUE);
 	}
 
 	/**
@@ -302,13 +334,13 @@ public class FileUtil {
 	 * specified <code>beginIndex</code> and extends to the end of the content
 	 * of the file.
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @param beginIndex
 	 *            the beginning index, inclusive
 	 * @return the specified substring
 	 */
-	public static String getString(String filePath, int beginIndex) {
-		return getString(filePath, beginIndex, Integer.MAX_VALUE);
+	public static String getString(String path, int beginIndex) {
+		return getString(path, beginIndex, Integer.MAX_VALUE);
 	}
 
 	/**
@@ -317,7 +349,7 @@ public class FileUtil {
 	 * specified <code>beginIndex</code> and extends to the character at index
 	 * <code>endIndex - 1</code> of the content of the file.
 	 * 
-	 * @param filePath
+	 * @param path
 	 *            the text path
 	 * @param beginIndex
 	 *            the beginning index, inclusive
@@ -325,8 +357,10 @@ public class FileUtil {
 	 *            the ending index, exclusive
 	 * @return the specified substring
 	 */
-	public static String getString(String filePath, int beginIndex, int endIndex) {
-		File textFile = new File(filePath);
+	public static String getString(String path, int beginIndex, int endIndex) {
+		if (!validPath(path))
+			return null;
+		File textFile = new File(path);
 		return getString(textFile, beginIndex, endIndex);
 	}
 
@@ -374,12 +408,12 @@ public class FileUtil {
 	 * Create a new file. If the file exists, it will be deleted first.
 	 * 
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @return <code>true</code> if and only if the file is created; <br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean createNewFileForce(String filePath) {
-		return createNewFileForce(filePath, 0);
+	public static boolean createNewFileForce(String path) {
+		return createNewFileForce(path, 0);
 	}
 
 	/**
@@ -399,13 +433,15 @@ public class FileUtil {
 	 * Create a new <code>fileLength</code>-byte file. If the file exists, it
 	 * will be deleted first.
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @param fileLength
 	 * @return <code>true</code> if and only if the file is created; <br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean createNewFileForce(String filePath, int fileLength) {
-		return createNewFileForce(new File(filePath), fileLength);
+	public static boolean createNewFileForce(String path, int fileLength) {
+		if (!validPath(path))
+			return false;
+		return createNewFileForce(new File(path), fileLength);
 	}
 
 	/**
@@ -452,6 +488,8 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean deleteDirectory(String dirPath) {
+		if (!validPath(dirPath))
+			return false;
 		boolean flag = true;
 		try {
 			flag = deleteAllFile(dirPath);
@@ -477,6 +515,8 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean deleteAllFile(String path) {
+		if (!validPath(path))
+			return false;
 		File file = new File(path);
 		if (!file.exists()) {
 			return false;
@@ -594,6 +634,8 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean mkdir(String path) {
+		if (!validPath(path))
+			return false;
 		if (path == null || path.trim().length() == 0 || path.endsWith(":")) {
 			return true;
 		}
@@ -631,16 +673,18 @@ public class FileUtil {
 
 	/**
 	 * <p>
-	 * Tests whether the file or directory denoted by this <code>filePath</code>
+	 * Tests whether the file or directory denoted by this <code>path</code>
 	 * exists.
 	 * 
 	 * @param path
 	 * @return <code>true</code> if and only if the file or directory denoted by
-	 *         this <code>filePath</code> exists; <br>
+	 *         this <code>path</code> exists; <br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean exists(String filePath) {
-		File file = new File(filePath);
+	public static boolean exists(String path) {
+		if (!validPath(path))
+			return false;
+		File file = new File(path);
 		return file.exists();
 	}
 
@@ -655,6 +699,10 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean copyDirectiory(String srcPath, String destPath) {
+		if (!validPath(srcPath))
+			return false;
+		if (!validPath(destPath))
+			return false;
 		File srcDir = new File(srcPath);
 		File destDir = new File(destPath);
 		mkdir(srcPath);
@@ -688,6 +736,10 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean copy(String srcPath, String destPath) {
+		if (!validPath(srcPath))
+			return false;
+		if (!validPath(destPath))
+			return false;
 		return copy(new File(srcPath), new File(destPath));
 	}
 
@@ -808,6 +860,8 @@ public class FileUtil {
 	 * @return the first line
 	 */
 	public static String getLine(String path) {
+		if (!validPath(path))
+			return null;
 		return getLine(new File(path));
 	}
 
@@ -918,11 +972,13 @@ public class FileUtil {
 	 * <p>
 	 * Get all lines as a new String array from the file.
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @return the array
 	 */
-	public static String[] getLines(String filePath) {
-		return getLines(new File(filePath));
+	public static String[] getLines(String path) {
+		if (!validPath(path))
+			return null;
+		return getLines(new File(path));
 	}
 
 	/**
@@ -980,12 +1036,14 @@ public class FileUtil {
 	 * Get the first <code>topN</code> lines as a new String array from the
 	 * file.
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @param topN
 	 * @return the array
 	 */
-	public static String[] getLines(String filePath, int topN) {
-		return getLines(new File(filePath), topN);
+	public static String[] getLines(String path, int topN) {
+		if (!validPath(path))
+			return null;
+		return getLines(new File(path), topN);
 	}
 
 	/**
@@ -1061,9 +1119,10 @@ public class FileUtil {
 	 *            the ending line index, exclusive
 	 * @return the specified array
 	 */
-	public static String[] getLines(String filePath, int beginIndex,
-			int endIndex) {
-		return getLines(new File(filePath), beginIndex, endIndex);
+	public static String[] getLines(String path, int beginIndex, int endIndex) {
+		if (!validPath(path))
+			return null;
+		return getLines(new File(path), beginIndex, endIndex);
 	}
 
 	/**
@@ -1074,6 +1133,8 @@ public class FileUtil {
 	 * @return the number of lines
 	 */
 	public static int getLinesNum(String path) {
+		if (!validPath(path))
+			return -1;
 		return getLinesNum(new File(path));
 	}
 
@@ -1138,8 +1199,10 @@ public class FileUtil {
 		return num;
 	}
 
-	public static String getCharset(String filePath) throws IOException {
-		File file = new File(filePath);
+	public static String getCharset(String path) throws IOException {
+		if (!validPath(path))
+			return null;
+		File file = new File(path);
 		FileInputStream fis = new FileInputStream(file);
 		BufferedInputStream bin = new BufferedInputStream(fis);
 		int p = (bin.read() << 8) + bin.read();
@@ -1160,5 +1223,91 @@ public class FileUtil {
 		bin.close();
 		fis.close();
 		return code;
+	}
+
+	/**
+	 * safely close
+	 *
+	 * @param stream
+	 *            the stream
+	 */
+	public static void safeClose(InputStream stream) {
+		if (stream != null) {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * safely close
+	 *
+	 * @param stream
+	 *            the imageInputStream
+	 */
+	public static void safeClose(ImageInputStream stream) {
+		if (stream != null) {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * safely close
+	 * 
+	 *
+	 * @param stream
+	 *            the stream
+	 */
+	public static void safeClose(OutputStream stream) {
+		if (stream != null) {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * safely close
+	 * 
+	 *
+	 * @param br
+	 *            the bufferedReader
+	 */
+	public static void safeClose(BufferedReader br) {
+		if (br != null) {
+			try {
+				br.close();
+			} catch (IOException e) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * safely close
+	 * 
+	 *
+	 * @param isr
+	 *            the inputStreamReader
+	 */
+	public static void safeClose(InputStreamReader isr) {
+		if (isr != null) {
+			try {
+				isr.close();
+			} catch (IOException e) {
+				return;
+			}
+		}
 	}
 }
