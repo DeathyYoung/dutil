@@ -9,5 +9,5 @@ package com.deathyyoung.jdbc.bean;
  * @since Apr 22, 2015
  */
 public enum ColumnType {
-	BLOB, CHAR, CLOB, DATE, INTEGER, TEXT, TIME, TIMESTAMP, VARCHAR, TINYINT
+	BLOB, CHAR, CLOB, DATE, INTEGER, TEXT, TIME, TIMESTAMP, VARCHAR, TINYINT, BIGINT
 }

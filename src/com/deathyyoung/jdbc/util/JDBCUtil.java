@@ -748,6 +748,7 @@ public class JDBCUtil {
 					switch (columnTypes[i]) {
 					case INTEGER:
 					case TINYINT:
+					case BIGINT:
 						value = rs.getInt(columnNames[i]);
 						break;
 					case DATE:
@@ -931,8 +932,8 @@ public class JDBCUtil {
 				for (int j = 0; j < valueNumber; j++) {
 					if (values.get(i + j) != null
 							&& values.get(i + j) instanceof java.lang.String) {
-						values.set(i + j, SecurityUtil.sqlValueFilter(values.get(
-								i + j).toString()));
+						values.set(i + j, SecurityUtil.sqlValueFilter(values
+								.get(i + j).toString()));
 					}
 					pstmt.setObject(j + 1, values.get(i + j));
 				}

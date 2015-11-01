@@ -1,11 +1,11 @@
-package com.deathyyoung.jdbc.demo;
+package com.deathyyoung.demo;
 
 import java.util.LinkedList;
 import java.util.Map;
 
 import com.deathyyoung.jdbc.util.JDBCUtil;
 
-public class Test {
+public class JDBCTest {
 	public static void main(String[] args) {
 		JDBCUtil ju = new JDBCUtil("test");
 

@@ -21,7 +21,7 @@
 		<!--连接池的别名 -->
 		<alias>test</alias>
 		<!--实现解密的工具类，需要proxool-0.9.1-encrypt.jar来替换proxool-0.9.1.jar -->
-		<encrypt>com.deathy.jdbc.proxool.DecUtil</encrypt>
+		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
 		<!--jdbc的url -->
 		<driver-url>jdbc:mysql://10.15.62.91:3306/test</driver-url>
 		<!--jdbc驱动 -->

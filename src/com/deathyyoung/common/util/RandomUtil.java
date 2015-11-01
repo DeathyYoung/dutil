@@ -7,7 +7,7 @@ package com.deathyyoung.common.util;
  * @date 2014-12-6 上午9:25:03
  *
  */
-public class RamdomUtil {
+public class RandomUtil {
 
 	/**
 	 * @Title: getFileName

@@ -16,7 +16,7 @@ import com.octo.captcha.service.image.ImageCaptchaService;
 import com.octo.captcha.service.multitype.GenericManageableCaptchaService;
 
 @SuppressWarnings("deprecation")
-public class CaptchaServiceSingleton {
+public class CaptchaSingletonService {
 	private static ImageCaptchaService service = null;
 
 	public static ImageCaptchaService getService() {
