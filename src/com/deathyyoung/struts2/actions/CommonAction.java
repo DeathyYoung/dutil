@@ -5,9 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.hibernate.Session;
 
+import com.deathyyoung.common.bean.PageBean;
 import com.deathyyoung.hibernate.dao.DbDao;
 import com.deathyyoung.hibernate.factory.DbDaoFactory;
-import com.deathyyoung.page.bean.PageBean;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**

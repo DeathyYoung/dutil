@@ -21,7 +21,6 @@ import java.util.Properties;
 import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 
 import com.deathyyoung.common.util.SecurityUtil;
-import com.deathyyoung.jdbc.bean.ColumnType;
 
 /**
  * <p>
@@ -298,8 +297,8 @@ public class JDBCUtil {
 	 *            预处理sql参数值
 	 * @return 字段类型
 	 */
-	public ColumnType[] getColumnTypes(String sql, Object... objs) {
-		ColumnType[] columnTypes = null;
+	public String[] getColumnTypes(String sql, Object... objs) {
+		String[] columnTypes = null;
 		open();
 		try {
 			pstmt = conn.prepareStatement(sql);
@@ -312,10 +311,9 @@ public class JDBCUtil {
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
-			columnTypes = new ColumnType[columnCount];
+			columnTypes = new String[columnCount];
 			for (int i = 0; i < columnTypes.length; i++) {
-				columnTypes[i] = ColumnType.valueOf(rsmd
-						.getColumnTypeName(i + 1));
+				columnTypes[i] = rsmd.getColumnTypeName(i + 1);
 			}
 			rs.close();
 			pstmt.close();
@@ -733,11 +731,10 @@ public class JDBCUtil {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 			String[] columnNames = new String[columnCount];
-			ColumnType[] columnTypes = new ColumnType[columnCount];
+			String[] columnTypes = new String[columnCount];
 			for (int i = 0; i < columnNames.length; i++) {
 				columnNames[i] = rsmd.getColumnName(i + 1);
-				columnTypes[i] = ColumnType.valueOf(rsmd
-						.getColumnTypeName(i + 1));
+				columnTypes[i] = rsmd.getColumnTypeName(i + 1);
 			}
 
 			while (rs.next()) {// 遍历结果集
@@ -745,31 +742,18 @@ public class JDBCUtil {
 				for (int i = 0; i < columnCount; i++) {
 					String key = columnNames[i];
 					Object value = null;
-					switch (columnTypes[i]) {
-					case INTEGER:
-					case TINYINT:
-					case BIGINT:
+					if (columnTypes[i].contains("INT")) {
 						value = rs.getInt(columnNames[i]);
-						break;
-					case DATE:
+					} else if (columnTypes[i].equals("DATE")) {
 						value = rs.getDate(columnNames[i]);
-						break;
-					case TIME:
+					} else if (columnTypes[i].equals("TIME")) {
 						value = rs.getTime(columnNames[i]);
-						break;
-					case TIMESTAMP:
+					} else if (columnTypes[i].equals("TIMESTAMP")) {
 						value = rs.getTimestamp(columnNames[i]);
-						break;
-					case BLOB:
+					} else if (columnTypes[i].equals("BLOB")) {
 						value = rs.getBinaryStream(columnNames[i]);
-						break;
-					case TEXT:
-					case CLOB:
-					case CHAR:
-					case VARCHAR:
-					default:
+					} else {
 						value = rs.getString(columnNames[i]);
-
 					}
 					rsMap.put(key, value);
 				}

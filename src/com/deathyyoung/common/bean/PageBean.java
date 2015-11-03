@@ -1,4 +1,4 @@
-package com.deathyyoung.page.bean;
+package com.deathyyoung.common.bean;
 
 import java.util.List;
 

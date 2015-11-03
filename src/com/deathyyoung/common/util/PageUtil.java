@@ -1,4 +1,4 @@
-package com.deathyyoung.page.util;
+package com.deathyyoung.common.util;
 
 /**
  * @see 分页封装及业务的处理类

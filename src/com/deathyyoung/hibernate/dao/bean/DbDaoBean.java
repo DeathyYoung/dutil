@@ -9,8 +9,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.deathyyoung.common.bean.PageBean;
 import com.deathyyoung.hibernate.dao.DbDao;
-import com.deathyyoung.page.bean.PageBean;
 
 /**
  * <p>

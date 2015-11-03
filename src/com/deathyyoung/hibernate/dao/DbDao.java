@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import com.deathyyoung.page.bean.PageBean;
+import com.deathyyoung.common.bean.PageBean;
 
 /**
  * <p>

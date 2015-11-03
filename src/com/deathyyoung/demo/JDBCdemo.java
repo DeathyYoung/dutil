@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.deathyyoung.jdbc.util.JDBCUtil;
 
-public class JDBCTest {
+public class JDBCdemo {
 	public static void main(String[] args) {
 		JDBCUtil ju = new JDBCUtil("test");
 
