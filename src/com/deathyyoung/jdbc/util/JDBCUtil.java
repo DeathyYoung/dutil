@@ -979,5 +979,13 @@ public class JDBCUtil {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	* <p> 判断是否有链接
+	*
+	*/ 
+	public boolean hasConn(){
+		return conn != null;
+	}
 
 }
