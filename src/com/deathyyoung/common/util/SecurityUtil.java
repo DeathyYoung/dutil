@@ -304,7 +304,7 @@ public class SecurityUtil {
 		if (value == null) {
 			return null;
 		}
-		StringBuffer result = new StringBuffer(value.length());
+		StringBuffer result = new StringBuffer();
 		for (int i = 0; i < value.length(); ++i) {
 			switch (value.charAt(i)) {
 			case '<':
@@ -344,7 +344,6 @@ public class SecurityUtil {
 		}
 		return new String(result);
 	}
-	
 
 	/**
 	 * <p>
@@ -361,8 +360,8 @@ public class SecurityUtil {
 		if (value == null) {
 			return null;
 		}
-		StringBuffer result = new StringBuffer(value.length());
-		for (int i = 0; i < value.length(); ++i) {
+		StringBuffer result = new StringBuffer();
+		for (int i = 0; i < value.length(); i++) {
 			switch (value.charAt(i)) {
 			case '<':
 				result.append("&lt;");
@@ -397,5 +396,31 @@ public class SecurityUtil {
 			}
 		}
 		return new String(result);
+	}
+
+	/**
+	 * <p>
+	 * 清除转义字符
+	 *
+	 * @param value
+	 *            字符串
+	 * @return 清除后的转义字符
+	 */
+	public static String valueUnfilter(String value) {
+		if (value == null) {
+			return null;
+		}
+		value = value.replaceAll("&gt;", ">");
+		value = value.replaceAll("&lt;", "<");
+		value = value.replaceAll("&quot;", "\"");
+		value = value.replaceAll("&#37;", "%");
+		value = value.replaceAll("&#39;", "\'");
+		value = value.replaceAll("&#40;", "(");
+		value = value.replaceAll("&#41;", ")");
+		value = value.replaceAll("&#43;", "+");
+		value = value.replaceAll("&#59;", ";");
+
+		value = value.replaceAll("&amp;", "&");
+		return value;
 	}
 }
