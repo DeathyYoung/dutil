@@ -34,5 +34,10 @@ public class JDBCdemo {
 			String username = result.get(i).get("username").toString();
 			System.out.println("id[username] = " + id + "[" + username + "]");
 		}
+		
+		String[] columnNames = ju.getColumnNames(sql);
+		for(String cn : columnNames){
+			System.out.println(cn);
+		}
 	}
 }
