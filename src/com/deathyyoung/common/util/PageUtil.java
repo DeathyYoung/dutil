@@ -59,7 +59,7 @@ public class PageUtil {
 	 * @return int类型分页起始位置
 	 */
 	public static int getStartIndex(int page, int rows) {
-		return page * rows;
+		return (page - 1) * rows;
 	}
 
 	/**
