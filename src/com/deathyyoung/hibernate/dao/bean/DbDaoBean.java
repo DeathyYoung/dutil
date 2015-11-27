@@ -155,17 +155,17 @@ public class DbDaoBean implements DbDao {
 			List<Object> list = query.list();
 			pagebean.setList(list);// 封装分页结构
 			System.out.println(new Date() + "当前页记录数量" + list.size() + "条");
-			pagebean.setFirstPage(firstResult);// 封装当前页的分页起始位置
+			pagebean.setStartIndex(firstResult);// 封装当前页的分页起始位置
 			System.out.println(new Date() + "当前页的分页起始位置" + firstResult);
-			pagebean.setMaxNum(maxNum);// 封装总记录数
+			pagebean.setTotalNum(maxNum);// 封装总记录数
 			System.out.println(new Date() + "总记录数量" + maxNum + "条");
-			pagebean.setMaxPageNum((maxNum + (maxResults - 1)) / maxResults);// 封装总页数
+			pagebean.setMaxPage((maxNum + (maxResults - 1)) / maxResults);// 封装总页数
 			System.out.println(new Date() + "共有" + (maxNum + (maxResults - 1))
 					/ maxResults + "页记录");
-			pagebean.setPageNum(firstResult / maxResults + 1);// 封装当前页
+			pagebean.setPage(firstResult / maxResults + 1);// 封装当前页
 			System.out.println(new Date() + "当前是第"
 					+ (firstResult / maxResults + 1) + "页");
-			pagebean.setPageRows(maxResults);// 封装每页显示记录数
+			pagebean.setRows(maxResults);// 封装每页显示记录数
 			System.out.println(new Date() + "每页显示" + maxResults + "条");
 			return pagebean;
 		} catch (Exception e) {

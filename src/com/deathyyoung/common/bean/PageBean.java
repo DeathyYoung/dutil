@@ -10,20 +10,32 @@ import java.util.List;
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  */
 public class PageBean {
+
+	/**
+	 * <p>
+	 * PageBean里按钮类型枚举，首页、上一页、下一页、尾页
+	 * 
+	 * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+	 *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+	 */
+	public enum Button {
+		FirstPage, PrePage, NextPage, LastPage
+	}
+
 	/** 结果集 */
 	private List<Object> list;
 	/** 总记录数 */
-	private int maxNum;
+	private int totalNum;
 	/** 总页数 */
-	private int maxPageNum;
-	/** 当前页数 */
-	private int pageNum;
+	private int maxPage;
+	/** 当前页码 */
+	private int page;
 	/** 分页游标起始位置 */
-	private int firstPage;
+	private int startIndex;
 	/** 每页显示记录数 */
-	private int pageRows;
+	private int rows;
 	/** 分页按钮 */
-	private int pageButton;
+	private Button button;
 
 	/**
 	 * @return the list
@@ -41,93 +53,93 @@ public class PageBean {
 	}
 
 	/**
-	 * @return the maxNum
+	 * @return the totalNum
 	 */
-	public int getMaxNum() {
-		return maxNum;
+	public int getTotalNum() {
+		return totalNum;
 	}
 
 	/**
-	 * @param maxNum
-	 *            the maxNum to set
+	 * @param totalNum
+	 *            the totalNum to set
 	 */
-	public void setMaxNum(int maxNum) {
-		this.maxNum = maxNum;
+	public void setTotalNum(int totalNum) {
+		this.totalNum = totalNum;
 	}
 
 	/**
-	 * @return the maxPageNum
+	 * @return the maxPage
 	 */
-	public int getMaxPageNum() {
-		return maxPageNum;
+	public int getMaxPage() {
+		return maxPage;
 	}
 
 	/**
-	 * @param maxPageNum
-	 *            the maxPageNum to set
+	 * @param maxPage
+	 *            the maxPage to set
 	 */
-	public void setMaxPageNum(int maxPageNum) {
-		this.maxPageNum = maxPageNum;
+	public void setMaxPage(int maxPage) {
+		this.maxPage = maxPage;
 	}
 
 	/**
-	 * @return the pageNum
+	 * @return the page
 	 */
-	public int getPageNum() {
-		return pageNum;
+	public int getPage() {
+		return page;
 	}
 
 	/**
-	 * @param pageNum
-	 *            the pageNum to set
+	 * @param page
+	 *            the page to set
 	 */
-	public void setPageNum(int pageNum) {
-		this.pageNum = pageNum;
+	public void setPage(int page) {
+		this.page = page;
 	}
 
 	/**
-	 * @return the firstPage
+	 * @return the startIndex
 	 */
-	public int getFirstPage() {
-		return firstPage;
+	public int getStartIndex() {
+		return startIndex;
 	}
 
 	/**
-	 * @param firstPage
-	 *            the firstPage to set
+	 * @param startIndex
+	 *            the startIndex to set
 	 */
-	public void setFirstPage(int firstPage) {
-		this.firstPage = firstPage;
+	public void setStartIndex(int startIndex) {
+		this.startIndex = startIndex;
 	}
 
 	/**
-	 * @return the pageRows
+	 * @return the rows
 	 */
-	public int getPageRows() {
-		return pageRows;
+	public int getRows() {
+		return rows;
 	}
 
 	/**
-	 * @param pageRows
-	 *            the pageRows to set
+	 * @param rows
+	 *            the rows to set
 	 */
-	public void setPageRows(int pageRows) {
-		this.pageRows = pageRows;
+	public void setRows(int rows) {
+		this.rows = rows;
 	}
 
 	/**
-	 * @return the pageButton
+	 * @return the button
 	 */
-	public int getPageButton() {
-		return pageButton;
+	public Button getButton() {
+		return button;
 	}
 
 	/**
-	 * @param pageButton
-	 *            the pageButton to set
+	 * @param button
+	 *            the button to set
 	 */
-	public void setPageButton(int pageButton) {
-		this.pageButton = pageButton;
+	public void setButton(Button button) {
+		this.button = button;
 	}
 
 }
