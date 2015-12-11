@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,6 +127,20 @@ public class RegexUtil {
 		Matcher matcher = pattern.matcher(content);
 		while (matcher.find())
 			ls.add(matcher.group(0));
+		return ls;
+	}
+
+	/**
+	 * @param content
+	 * @param pat
+	 * @return Set<String> extra a string Set
+	 */
+	public static Set<String> extraSet(String content, String pat) {
+		Set<String> ls = new TreeSet<String>();
+		Pattern pattern = Pattern.compile(pat);
+		Matcher matcher = pattern.matcher(content);
+		while (matcher.find())
+			ls.add(matcher.group());
 		return ls;
 	}
 
