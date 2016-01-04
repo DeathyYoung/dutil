@@ -43,11 +43,12 @@ public class HttpUtil {
 	 *            file extension
 	 * @return mime type
 	 */
-	public static String getMIME(String extension) {
+	public static String getMIMEType(String extension) {
+		extension = extension.toLowerCase();
 		String mime = pro.getProperty(extension);
 		return mime == null ? pro.getProperty("default") : mime;
 	}
-	
+
 	/**
 	 * <p>
 	 * get http content-type
@@ -57,7 +58,7 @@ public class HttpUtil {
 	 * @return http content-type
 	 */
 	public static String getHTTPContentType(String extension) {
-		return getMIME(extension);
+		return getMIMEType(extension);
 	}
 
 	/**
