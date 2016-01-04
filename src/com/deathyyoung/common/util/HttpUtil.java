@@ -11,7 +11,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
+
+import com.deathyyoung.jdbc.util.JDBCUtil;
 
 /**
  * @ClassName: HttpUtil
@@ -20,6 +23,42 @@ import java.util.Map.Entry;
  *
  */
 public class HttpUtil {
+
+	private static Properties pro;
+
+	static {
+		pro = new Properties();
+		try {
+			pro.load(JDBCUtil.class.getResourceAsStream("/mime.properties"));
+		} catch (IOException e) {
+			System.out.println("未找到配置文件！！！");
+		}
+	}
+
+	/**
+	 * <p>
+	 * get mime type
+	 *
+	 * @param extension
+	 *            file extension
+	 * @return mime type
+	 */
+	public static String getMIME(String extension) {
+		String mime = pro.getProperty(extension);
+		return mime == null ? pro.getProperty("default") : mime;
+	}
+	
+	/**
+	 * <p>
+	 * get http content-type
+	 *
+	 * @param extension
+	 *            file extension
+	 * @return http content-type
+	 */
+	public static String getHTTPContentType(String extension) {
+		return getMIME(extension);
+	}
 
 	/**
 	 * <p>

@@ -19,16 +19,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-/**
- * <P>
- * 在DES中，使用了一个 56 位的密钥以及附加的8位奇偶校验位，产生最大64 位的分组大小。
- * <P>
- * 加密过程中，将加密的文本块分成两半。
- * <P>
- * 使用子密钥对其中一半应用循环功能，然后将输出与另一半进行“异或”运算；接着交换这两半。
- * <P>
- * 循环往复。SecurityUtil 使用16个循环，但最后一个循环不交换。
- */
 public class SecurityUtil {
 	// KeyGenerator提供对称密钥生成器的功能，支持各种算法
 	private static KeyGenerator keygen;
@@ -124,9 +114,14 @@ public class SecurityUtil {
 	}
 
 	/**
-	 * Title: selectDES
 	 * <P>
-	 * Description: 选择使用DES加密算法
+	 * 在DES中，使用了一个 56 位的密钥以及附加的8位奇偶校验位，产生最大64 位的分组大小。
+	 * <P>
+	 * 加密过程中，将加密的文本块分成两半。
+	 * <P>
+	 * 使用子密钥对其中一半应用循环功能，然后将输出与另一半进行“异或”运算；接着交换这两半。
+	 * <P>
+	 * 循环往复。SecurityUtil 使用16个循环，但最后一个循环不交换。
 	 */
 	public void selectDES() {
 		Security.addProvider(new com.sun.crypto.provider.SunJCE());
