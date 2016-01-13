@@ -40,11 +40,29 @@ public class JDBCFactory {
 		}
 		JDBCUtil ju = null;
 		ju = jdbcMap.get(alias);
-		if (ju == null || !ju.hasConn() || ju.isConnClosed()) {
+		if (ju == null || !ju.hasConn() || ju.isConnClosed()) {// 还需加强判断
 			ju = new JDBCUtil(alias);
 			jdbcMap.put(alias, ju);
 			return ju;
 		}
+		return ju;
+	}
+
+	/**
+	 * <p>
+	 * 获得一个新的 JDBCUtil
+	 *
+	 * @param alias
+	 * @return
+	 * @since Apr 16, 2015
+	 */
+	public static JDBCUtil getJDBCUtilForce(String alias) {
+		if (jdbcMap == null) {
+			jdbcMap = new LinkedHashMap<String, JDBCUtil>();
+		}
+		JDBCUtil ju = null;
+		ju = new JDBCUtil(alias);
+		jdbcMap.put(alias, ju);
 		return ju;
 	}
 }
