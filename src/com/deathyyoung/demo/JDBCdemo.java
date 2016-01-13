@@ -5,39 +5,106 @@ import java.util.Map;
 
 import com.deathyyoung.jdbc.util.JDBCUtil;
 
-public class JDBCdemo {
-	public static void main(String[] args) {
-		JDBCUtil ju = new JDBCUtil("test");
+class JDBCDemoThread extends Thread {
+	int id = 0;
 
-		// 遍历
-		String sql = "select * from userinfo";
-		LinkedList<Map<String, Object>> result = ju.executeQuery(sql);
-		for (int i = 0; i < result.size(); i++) {
-			String id = result.get(i).get("id").toString();
-			String username = result.get(i).get("username").toString();
-			System.out.println("id[username] = " + id + "[" + username + "]");
+	static int countConn = 0;
+	static int count = 0;
+	static int max = 0;
+	static boolean stop = false;
+
+	public JDBCDemoThread(int id) {
+		this.id = id;
+	}
+
+	public void run() {
+		countConn++;
+		JDBCUtil ju = new JDBCUtil("test");
+		String sql = "SELECT COUNT(1) AS c, p.COMMAND AS com FROM information_schema.PROCESSLIST p WHERE db = ? GROUP BY p.COMMAND";
+		LinkedList<Map<String, Object>> rst = null;
+		for (int c = 0; c < 100; c++) {
+			// System.out.println(count++);
+
+			if (stop){
+				return;
+			}
+			if (countConn % 10 == 0 || count % 10 == 0) {
+				System.out.println("conn: " + countConn + " stat: " + count);
+			}
+			if (countConn % 10 == 0) {
+				System.out.println("CONN: " + countConn);
+			}
+			count++;
+			rst = ju.executeQuery(sql, "test");
+			count--;
+			int all = 0;
+			for (int i = 0; i < rst.size(); i++) {
+				Map<String, Object> info = rst.get(i);
+				System.out.println(id + "==>Command: " + info.get("com") + " ["
+						+ info.get("c") + "] ");
+				all+=Integer.parseInt(info.get("c").toString());
+			}
+			if(all>=max){
+				max = all;
+			} else {
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				System.out.println("BIG BANG!");
+				stop=true;
+			}
 		}
-		//插入
-		int newId = 3;
-		String newUsername = "candy2";
-		
-		sql = "insert userinfo values (?, ?)";
-		ju.execute(sql, newId, newUsername);
-		
-		System.out.println("===============================================");
-		
-		// 遍历
-		sql = "select * from userinfo";
-		result = ju.executeQuery(sql);
-		for (int i = 0; i < result.size(); i++) {
-			String id = result.get(i).get("id").toString();
-			String username = result.get(i).get("username").toString();
-			System.out.println("id[username] = " + id + "[" + username + "]");
+		countConn--;
+	}
+}
+
+class JDBCDemoThread2 extends Thread {
+	static int count = 0;
+	static JDBCUtil ju = new JDBCUtil("test");
+
+	int id = 0;
+
+	public JDBCDemoThread2(int id) {
+		this.id = id;
+	}
+
+	public void run() {
+		// try {
+		// Thread.sleep(id*10);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		String sql = "SELECT COUNT(1) AS c, p.COMMAND AS com FROM information_schema.PROCESSLIST p WHERE db = ? GROUP BY p.COMMAND";
+		LinkedList<Map<String, Object>> rst = null;
+		for (int c = 0; c < 1; c++) {
+			// System.out.println(count++);
+			rst = ju.executeQuery(sql, "test");
+			for (int i = 0; i < rst.size(); i++) {
+				Map<String, Object> info = rst.get(i);
+				System.out.println(id + "==>Command: " + info.get("com") + " ["
+						+ info.get("c") + "] ");
+			}
+			// count--;
 		}
-		
-		String[] columnNames = ju.getColumnNames(sql);
-		for(String cn : columnNames){
-			System.out.println(cn);
+	}
+}
+
+public class JDBCdemo {
+
+	public static void main(String[] args) {
+		for (int i = 0; i < 90; i++) {
+			JDBCDemoThread jdt = new JDBCDemoThread(i);
+			jdt.start();
 		}
+		// for (int i = 0; i < 1000; i++) {
+		// JDBCDemoThread2 jdt = new JDBCDemoThread2(i);
+		// jdt.start();
+		// }
+
 	}
 }

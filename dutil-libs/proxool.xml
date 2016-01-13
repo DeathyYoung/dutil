@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <proxool-config>
-	<proxool>
-		<alias>myapp</alias>
-		<driver-url>jdbc:mysql://127.0.0.1:3306/test</driver-url>
-		<driver-class>com.mysql.jdbc.Driver</driver-class>
-		<driver-properties>
-			<property name="user" value="user" />
-			<property name="password" value="password" />
-		</driver-properties>
-		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
-		<maximum-connection-count>50</maximum-connection-count>
-		<minimum-connection-count>1</minimum-connection-count>
-		<prototype-count>1</prototype-count>
-		<simultaneous-build-throttle>100</simultaneous-build-throttle>
-		<statistics>10m,1h,1d</statistics>
-		<statistics-log-level>INFO</statistics-log-level>
-	</proxool>
 
 	<proxool>
 		<!--连接池的别名 -->
@@ -23,7 +7,7 @@
 		<!--实现解密的工具类，需要proxool-0.9.1-encrypt.jar来替换proxool-0.9.1.jar -->
 		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
 		<!--jdbc的url -->
-		<driver-url>jdbc:mysql://10.15.62.91:3306/test</driver-url>
+		<driver-url>jdbc:mysql://10.15.62.91:3306/test?autoReconnectForPools=true&amp;useUnicode=true&amp;failOverReadOnly=false</driver-url>
 		<!--jdbc驱动 -->
 		<driver-class>com.mysql.jdbc.Driver</driver-class>
 		<driver-properties>
@@ -31,17 +15,21 @@
 			<property name="password" value="bWFwbGUzNTc=" />
 		</driver-properties>
 		<!-- house keeper 保留线程处于睡眠状态的最长时间,house keeper 的职责就是检查各个连接的状态,并判断是否需要销毁或者创建. -->
-		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
+		<house-keeping-sleep-time>300000</house-keeping-sleep-time>
 		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
 		<maximum-active-time>60000</maximum-active-time>
+		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
+		<maximum-connection-lifetime>300000</maximum-connection-lifetime>
+		<!-- 如果侦察线程发现闲置连接，则会使用这个SQL语句来对这些连接进行检查 -->
+		<property name="houseKeepingTestSql" value="select CURRENT_DATE" />
 		<!-- 最大的数据库连接数 -->
-		<maximum-connection-count>2048</maximum-connection-count>
+		<maximum-connection-count>255</maximum-connection-count>
 		<!-- 最小的数据库连接数 -->
-		<minimum-connection-count>16</minimum-connection-count>
+		<minimum-connection-count>10</minimum-connection-count>
 		<!-- 连接池中可用的连接数量 -->
-		<prototype-count>16</prototype-count>
+		<prototype-count>10</prototype-count>
 		<!-- 同时最大连接数 -->
-		<simultaneous-build-throttle>128</simultaneous-build-throttle>
+		<simultaneous-build-throttle>10</simultaneous-build-throttle>
 		<!-- 连接池使用状况统计 -->
 		<statistics>10m,1h,1d</statistics>
 		<!-- 日志统计跟踪类型。 参数“ERROR”或 “INFO” -->

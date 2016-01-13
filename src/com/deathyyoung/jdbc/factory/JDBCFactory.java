@@ -40,10 +40,14 @@ public class JDBCFactory {
 		}
 		JDBCUtil ju = null;
 		ju = jdbcMap.get(alias);
-		if (ju == null || !ju.hasConn() || ju.isConnClosed()) {// 还需加强判断
-			ju = new JDBCUtil(alias);
-			jdbcMap.put(alias, ju);
-			return ju;
+		try {
+			if (ju == null || !ju.hasConn() || ju.isConnClosed()) {// 还需加强判断
+				ju = new JDBCUtil(alias);
+				jdbcMap.put(alias, ju);
+				return ju;
+			}
+		} catch (Exception e) {
+			return getJDBCUtilForce(alias);
 		}
 		return ju;
 	}
