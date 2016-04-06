@@ -17,7 +17,7 @@
 		<!-- house keeper 保留线程处于睡眠状态的最长时间,house keeper 的职责就是检查各个连接的状态,并判断是否需要销毁或者创建. -->
 		<house-keeping-sleep-time>300000</house-keeping-sleep-time>
 		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
-		<maximum-active-time>60000</maximum-active-time>
+		<maximum-active-time>300000</maximum-active-time>
 		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
 		<maximum-connection-lifetime>300000</maximum-connection-lifetime>
 		<!-- 如果侦察线程发现闲置连接，则会使用这个SQL语句来对这些连接进行检查 -->
@@ -29,7 +29,7 @@
 		<!-- 连接池中可用的连接数量 -->
 		<prototype-count>10</prototype-count>
 		<!-- 同时最大连接数 -->
-		<simultaneous-build-throttle>10</simultaneous-build-throttle>
+		<simultaneous-build-throttle>50</simultaneous-build-throttle>
 		<!-- 连接池使用状况统计 -->
 		<statistics>10m,1h,1d</statistics>
 		<!-- 日志统计跟踪类型。 参数“ERROR”或 “INFO” -->

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -30,8 +31,8 @@ import org.apache.lucene.util.ReaderUtil;
 
 /**
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy Young</a>
- *         (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Mar 9, 2015
  */
 @SuppressWarnings("unchecked")
@@ -44,10 +45,24 @@ public class LuceneUtil {
 	/** IndexReader */
 	private IndexReader reader;
 
+	/**
+	 * <p>
+	 * 查询方式
+	 * 
+	 * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+	 *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+	 */
 	public static enum QueryMethod {
 		Term, Wildcard
 	};
 
+	/**
+	 * <p>
+	 * 构造函数
+	 *
+	 * @param indexPath
+	 *            索引路径
+	 */
 	public LuceneUtil(String indexPath) {
 		try {
 			dir = FSDirectory.open(new File(indexPath));
@@ -60,7 +75,7 @@ public class LuceneUtil {
 
 	/**
 	 * <p>
-	 * Get the fieldInfos.
+	 * 获取字段信息
 	 *
 	 * @return <code>FieldInfos</code>
 	 */
@@ -70,9 +85,9 @@ public class LuceneUtil {
 
 	/**
 	 * <p>
-	 * Get the field names.
+	 * 获取字段名称
 	 *
-	 * @return the field names.
+	 * @return 字段名称
 	 */
 	public String[] getFieldNames() {
 		FieldInfos fis = getFieldInfos();
@@ -88,9 +103,9 @@ public class LuceneUtil {
 
 	/**
 	 * <p>
-	 * Get all documents.
+	 * 获取所有文档
 	 *
-	 * @return all documents
+	 * @return 所有文档
 	 */
 	public List<Document> getAllDocs() {
 		List<Document> list = new LinkedList<Document>();
@@ -108,6 +123,14 @@ public class LuceneUtil {
 		return list;
 	}
 
+	/**
+	 * <p>
+	 * 将所有文档转换为List，每个文档转换为一个Map
+	 *
+	 * @param docs
+	 *            所有文档
+	 * @return List
+	 */
 	public List<Map<String, String>> getListFromDocs(List<Document> docs) {
 		String[] fieldNames = getFieldNames();
 		List<Map<String, String>> list = new LinkedList<Map<String, String>>();
@@ -122,28 +145,107 @@ public class LuceneUtil {
 		return list;
 	}
 
+	/**
+	 * <p>
+	 * 根据指定字段的指定值进行查询，结果为一个列表
+	 *
+	 * @param key
+	 *            字段
+	 * @param value
+	 *            值
+	 * @return 文档列表
+	 */
 	public List<Document> queryTerm(String key, String value) {
 		return queryTerm(Integer.MAX_VALUE, new SimpleEntry<String, String>(
 				key, value));
 	}
 
+	/**
+	 * <p>
+	 * 查询前topN个文档，如果不够topN个，则有几个显示几个
+	 *
+	 * @param topN
+	 *            前N个
+	 * @param key
+	 *            字段
+	 * @param value
+	 *            值
+	 * @return 文档列表
+	 */
 	public List<Document> queryTerm(int topN, String key, String value) {
 		return queryTerm(topN, new SimpleEntry<String, String>(key, value));
 	}
 
-	public List<Document> queryTerm(Entry<String, String> term) {
-		return queryTerm(Integer.MAX_VALUE, term);
+	/**
+	 * 查询文档
+	 *
+	 * @param entry
+	 *            查询条件
+	 * @return 文档列表
+	 */
+	public List<Document> queryTerm(Entry<String, String> entry) {
+		return queryTerm(Integer.MAX_VALUE, entry);
 	}
 
-	public List<Document> queryTerm(int topN, Entry<String, String> term) {
-		return queryTerms(topN, term);
+	/**
+	 * <p>
+	 * 查询文档
+	 *
+	 * @param map
+	 *            查询条件
+	 * @return 文档列表
+	 */
+	public List<Document> queryTerm(Map<String, String> map) {
+		return queryTerm(Integer.MAX_VALUE, map);
+	}
+
+	/**
+	 * 查询文档
+	 *
+	 * @param topN
+	 *            前N个
+	 * @param entry
+	 *            查询条件
+	 * @return 文档列表
+	 */
+	public List<Document> queryTerm(int topN, Entry<String, String> entry) {
+		return queryTerms(topN, entry);
+	}
+
+	/**
+	 * 查询文档
+	 *
+	 * @param topN
+	 *            前N个
+	 * @param map
+	 *            查询条件
+	 * @return 文档列表
+	 */
+	public List<Document> queryTerm(int topN, Map<String, String> map) {
+		return queryTerms(topN, map);
 	}
 
 	public List<Document> queryTerms(Entry<String, String>... terms) {
 		return queryTerms(Integer.MAX_VALUE, terms);
 	}
 
+	public List<Document> queryTerms(Set<Entry<String, String>> terms) {
+		return queryTerms(Integer.MAX_VALUE, terms);
+	}
+
+	public List<Document> queryTerms(Map<String, String> terms) {
+		return queryTerms(Integer.MAX_VALUE, terms);
+	}
+
 	public List<Document> queryTerms(int topN, Entry<String, String>... terms) {
+		return query(QueryMethod.Term, topN, terms);
+	}
+
+	public List<Document> queryTerms(int topN, Set<Entry<String, String>> terms) {
+		return query(QueryMethod.Term, topN, terms);
+	}
+
+	public List<Document> queryTerms(int topN, Map<String, String> terms) {
 		return query(QueryMethod.Term, topN, terms);
 	}
 
@@ -156,6 +258,10 @@ public class LuceneUtil {
 		return queryWildcard(topN, new SimpleEntry<String, String>(key, value));
 	}
 
+	public List<Document> queryWildcard(Map<String, String> term) {
+		return queryWildcards(Integer.MAX_VALUE, term);
+	}
+
 	public List<Document> queryWildcard(Entry<String, String> term) {
 		return queryWildcards(Integer.MAX_VALUE, term);
 	}
@@ -164,12 +270,33 @@ public class LuceneUtil {
 		return queryWildcards(topN, term);
 	}
 
+	public List<Document> queryWildcard(int topN, Map<String, String> term) {
+		return queryWildcards(topN, term);
+	}
+
+	public List<Document> queryWildcards(Set<Entry<String, String>> terms) {
+		return queryWildcards(Integer.MAX_VALUE, terms);
+	}
+
 	public List<Document> queryWildcards(Entry<String, String>... terms) {
+		return queryWildcards(Integer.MAX_VALUE, terms);
+	}
+
+	public List<Document> queryWildcards(Map<String, String> terms) {
 		return queryWildcards(Integer.MAX_VALUE, terms);
 	}
 
 	public List<Document> queryWildcards(int topN,
 			Entry<String, String>... terms) {
+		return query(QueryMethod.Wildcard, topN, terms);
+	}
+
+	public List<Document> queryWildcards(int topN,
+			Set<Entry<String, String>> terms) {
+		return query(QueryMethod.Wildcard, topN, terms);
+	}
+
+	public List<Document> queryWildcards(int topN, Map<String, String> terms) {
 		return query(QueryMethod.Wildcard, topN, terms);
 	}
 
@@ -203,6 +330,43 @@ public class LuceneUtil {
 			e.printStackTrace();
 		}
 		return docs;
+	}
+
+	public List<Document> query(QueryMethod qm, int topN,
+			Set<Entry<String, String>> entrySet) {
+		List<Document> docs = new LinkedList<Document>();
+		TopDocs matches = null;
+		try {
+			BooleanQuery bq = new BooleanQuery();
+			switch (qm) {
+			case Term:
+				for (Entry<String, String> entry : entrySet) {
+					bq.add(new TermQuery(new Term(entry.getKey(), entry
+							.getValue())), BooleanClause.Occur.SHOULD);
+				}
+				break;
+			case Wildcard:
+				for (Entry<String, String> entry : entrySet) {
+					bq.add(new WildcardQuery(new Term(entry.getKey(), entry
+							.getValue())), BooleanClause.Occur.SHOULD);
+				}
+				break;
+			default:
+				break;
+			}
+			matches = searcher.search(bq, topN);
+			for (int i = 0; i < matches.scoreDocs.length; i++) {
+				docs.add(reader.document(matches.scoreDocs[i].doc));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return docs;
+	}
+
+	public List<Document> query(QueryMethod qm, int topN,
+			Map<String, String> map) {
+		return query(qm, topN, map.entrySet());
 	}
 
 	public int find(String fld, String key) {
