@@ -35,4 +35,27 @@
 		<!-- 日志统计跟踪类型。 参数“ERROR”或 “INFO” -->
 		<statistics-log-level>INFO</statistics-log-level>
 	</proxool>
+	
+	
+	<proxool>
+		<alias>cadal_metadata_full_dbo2</alias>
+		<driver-url>jdbc:mysql://10.15.62.59:3306/cadal_metadata_full_dbo2
+		</driver-url>
+		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
+		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="cm9vdA==" />
+			<property name="password" value="Q2FkYWwyMDU=" />
+		</driver-properties>
+		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
+		<maximum-connection-count>1000</maximum-connection-count>
+		<minimum-connection-count>16</minimum-connection-count>
+		<maximum-active-time>60000</maximum-active-time>
+		<maximum-connection-lifetime>300000</maximum-connection-lifetime>
+		<property name="houseKeepingTestSql" value="select CURRENT_DATE" />
+		<prototype-count>1</prototype-count>
+		<simultaneous-build-throttle>255</simultaneous-build-throttle>
+		<statistics>10m,1h,1d</statistics>
+		<statistics-log-level>INFO</statistics-log-level>
+	</proxool>
 </proxool-config>

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -380,14 +381,17 @@ public class FileUtil {
 	public static String getString(File textFile, int beginIndex, int endIndex) {
 		StringBuffer sb = new StringBuffer();
 		try {
+			String charset = getCharset(textFile);
+			InputStreamReader reader = new InputStreamReader(
+					new FileInputStream(textFile), charset);
 			@SuppressWarnings("resource")
-			FileReader fr = new FileReader(textFile);
-			fr.skip(beginIndex);
+			BufferedReader br = new BufferedReader(reader);
+			br.skip(beginIndex);
 			int charSize = 1024;
 			char[] cs = new char[charSize];
 			int length = -1;
 			int i = 0;
-			while ((length = fr.read(cs)) > 0) {
+			while ((length = br.read(cs)) > 0) {
 				for (int j = 0; j < length && i < endIndex - beginIndex; i++, j++) {
 					sb.append(cs[j]);
 				}
@@ -905,12 +909,12 @@ public class FileUtil {
 	 * @return the <code>lineNum</code>-th line
 	 */
 	public static String getLine(File in, int lineNum) {
-		FileReader reader = null;
 		String str = null;
-		BufferedReader br = null;
 		try {
-			reader = new FileReader(in);
-			br = new BufferedReader(reader);
+			String charset = getCharset(in);
+			InputStreamReader reader = new InputStreamReader(
+					new FileInputStream(in), charset);
+			BufferedReader br = new BufferedReader(reader);
 			str = getLine(br, lineNum);
 			br.close();
 			reader.close();
@@ -951,12 +955,13 @@ public class FileUtil {
 	 * @return the array
 	 */
 	public static String[] getLines(File in) {
-		FileReader reader = null;
 		String[] strs = null;
-		BufferedReader br = null;
 		try {
-			reader = new FileReader(in);
-			br = new BufferedReader(reader);
+			// reader = new FileReader(in);
+			String charset = getCharset(in);
+			InputStreamReader reader = new InputStreamReader(
+					new FileInputStream(in), charset);
+			BufferedReader br = new BufferedReader(reader);
 			strs = getLines(br);
 			br.close();
 			reader.close();
@@ -1015,12 +1020,12 @@ public class FileUtil {
 	 * @return the array
 	 */
 	public static String[] getLines(File in, int topN) {
-		FileReader reader = null;
 		String[] str = null;
-		BufferedReader br = null;
 		try {
-			reader = new FileReader(in);
-			br = new BufferedReader(reader);
+			String charset = getCharset(in);
+			InputStreamReader reader = new InputStreamReader(
+					new FileInputStream(in), charset);
+			BufferedReader br = new BufferedReader(reader);
 			str = getLines(br, topN);
 			br.close();
 			reader.close();
@@ -1088,12 +1093,12 @@ public class FileUtil {
 	 * @return the specified array
 	 */
 	public static String[] getLines(File in, int beginIndex, int endIndex) {
-		FileReader reader = null;
 		String[] str = null;
-		BufferedReader br = null;
 		try {
-			reader = new FileReader(in);
-			br = new BufferedReader(reader);
+			String charset = getCharset(in);
+			InputStreamReader reader = new InputStreamReader(
+					new FileInputStream(in), charset);
+			BufferedReader br = new BufferedReader(reader);
 			str = getLines(br, beginIndex, endIndex);
 			br.close();
 			reader.close();
@@ -1183,6 +1188,25 @@ public class FileUtil {
 	 * <p>
 	 * Get the number of lines of the content.
 	 * 
+	 * @param reader
+	 * @return the number of lines
+	 */
+	public static int getLinesNum(InputStreamReader reader) {
+		int num = -1;
+		try {
+			BufferedReader br = new BufferedReader(reader);
+			num = getLinesNum(br);
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return num;
+	}
+
+	/**
+	 * <p>
+	 * Get the number of lines of the content.
+	 * 
 	 * @param br
 	 * @return the number of lines
 	 */
@@ -1199,29 +1223,86 @@ public class FileUtil {
 		return num;
 	}
 
-	public static String getCharset(String path) throws IOException {
-		if (!validPath(path))
-			return null;
-		File file = new File(path);
-		FileInputStream fis = new FileInputStream(file);
-		BufferedInputStream bin = new BufferedInputStream(fis);
-		int p = (bin.read() << 8) + bin.read();
+	/**
+	 * <p>
+	 * get the file's charset
+	 *
+	 * @param path
+	 *            the text file path
+	 * @return charset
+	 */
+	public static String getCharset(String path) {
 		String code = null;
-		switch (p) {
-		case 0xefbb:
-			code = "UTF-8";
-			break;
-		case 0xfffe:
-			code = "UTF-16LE";
-			break;
-		case 0xfeff:
-			code = "UTF-16BE";
-			break;
-		default:
-			code = "GBK";
+		if (!validPath(path))
+			return code;
+		File file = new File(path);
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			BufferedInputStream bin = new BufferedInputStream(fis);
+			int p = (bin.read() << 8) + bin.read();
+			switch (p) {
+			case 0xefbb:
+				code = "UTF-8";
+				break;
+			case 0xfffe:
+				code = "UTF-16LE";
+				break;
+			case 0xfeff:
+				code = "UTF-16BE";
+				break;
+			default:
+				code = "GBK";
+			}
+			bin.close();
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		bin.close();
-		fis.close();
+		return code;
+	}
+
+	/**
+	 * <p>
+	 * get the file's charset
+	 *
+	 * @param file
+	 *            the text file
+	 * @return charset
+	 */
+	public static String getCharset(File file) {
+		String code = null;
+		if (file == null || !file.exists())
+			return code;
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			String dc = Charset.defaultCharset().name();
+			UnicodeInputStream uin = new UnicodeInputStream(fis, dc);
+			if ("UTF-8".equals(uin.getEncoding())) {
+				uin.close();
+				return "UTF-8";
+			}
+			uin.close();
+			byte[] head = new byte[3];
+			fis.read(head);
+			code = "GBK";
+			if (head[0] == -1 && head[1] == -2)
+				code = "UTF-16";
+			if (head[0] == -2 && head[1] == -1)
+				code = "Unicode";
+			// 带BOM
+			if (head[0] == -17 && head[1] == -69 && head[2] == -65)
+				code = "UTF-8";
+			if ("Unicode".equals(code)) {
+				code = "UTF-16";
+			}
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return code;
 	}
 

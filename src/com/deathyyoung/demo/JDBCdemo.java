@@ -3,6 +3,7 @@ package com.deathyyoung.demo;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.deathyyoung.jdbc.factory.JDBCFactory;
 import com.deathyyoung.jdbc.util.JDBCUtil;
 
 class JDBCDemoThread extends Thread {
@@ -25,7 +26,7 @@ class JDBCDemoThread extends Thread {
 		for (int c = 0; c < 100; c++) {
 			// System.out.println(count++);
 
-			if (stop){
+			if (stop) {
 				return;
 			}
 			if (countConn % 10 == 0 || count % 10 == 0) {
@@ -42,9 +43,9 @@ class JDBCDemoThread extends Thread {
 				Map<String, Object> info = rst.get(i);
 				System.out.println(id + "==>Command: " + info.get("com") + " ["
 						+ info.get("c") + "] ");
-				all+=Integer.parseInt(info.get("c").toString());
+				all += Integer.parseInt(info.get("c").toString());
 			}
-			if(all>=max){
+			if (all >= max) {
 				max = all;
 			} else {
 				System.out.println("BIG BANG!");
@@ -56,7 +57,7 @@ class JDBCDemoThread extends Thread {
 				System.out.println("BIG BANG!");
 				System.out.println("BIG BANG!");
 				System.out.println("BIG BANG!");
-				stop=true;
+				stop = true;
 			}
 		}
 		countConn--;
@@ -97,14 +98,11 @@ class JDBCDemoThread2 extends Thread {
 public class JDBCdemo {
 
 	public static void main(String[] args) {
-		for (int i = 0; i < 90; i++) {
-			JDBCDemoThread jdt = new JDBCDemoThread(i);
-			jdt.start();
-		}
-		// for (int i = 0; i < 1000; i++) {
-		// JDBCDemoThread2 jdt = new JDBCDemoThread2(i);
-		// jdt.start();
-		// }
-
+		String alias = "cadal_metadata_full_dbo2";
+		JDBCUtil ju = JDBCFactory.getJDBCUtil(alias);
+		String sql = "select BookNo, Title from cbook where bookno = ?";
+		LinkedList<Map<String, Object>> rst = ju.executeQuery(sql, 3);
+		System.out.println(rst.get(0).get("BookNo"));
+		System.out.println(rst.get(0).get("Title"));
 	}
 }
