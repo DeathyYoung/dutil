@@ -4,6 +4,16 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 public class MathUtil {
+
+	/** df2Digit */
+	public static final DecimalFormat df2Digit = new DecimalFormat("#0.00");
+
+	/** subIndex */
+	private int subIndex;
+
+	/** indexs */
+	private int[] indexs;
+
 	/**
 	 * 两点间的距离
 	 * 
@@ -45,11 +55,6 @@ public class MathUtil {
 	}
 
 	/**
-	 * @Fields df2Digit
-	 */
-	public static final DecimalFormat df2Digit = new DecimalFormat("#0.00");
-
-	/**
 	 * @Title: get2Digit
 	 * @param number
 	 * @return String
@@ -76,11 +81,6 @@ public class MathUtil {
 		bd = null;
 		return d;
 	}
-
-	/* subIndex */
-	private int subIndex;
-	/* indexs */
-	private int[] indexs;
 
 	/**
 	 * Title: getRandomDoubleArray

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * <p>
@@ -26,8 +27,8 @@ public class SerialUtil {
 	 * @param filePath
 	 *            保存Java对象的文件路径
 	 */
-	public static void writeObjectToFile(Object obj, String filePath) {
-		writeObjectToFile(obj, new File(filePath));
+	public static void writeObjectToFile(Serializable serialObj, String filePath) {
+		writeObjectToFile(serialObj, new File(filePath));
 	}
 
 	/**
@@ -39,7 +40,7 @@ public class SerialUtil {
 	 * @param file
 	 *            保存Java对象的文件
 	 */
-	public static void writeObjectToFile(Object obj, File file) {
+	public static void writeObjectToFile(Serializable serialObj, File file) {
 		if (file.exists()) {
 			file.delete();
 		}
@@ -47,7 +48,7 @@ public class SerialUtil {
 		try {
 			out = new FileOutputStream(file);
 			ObjectOutputStream objOut = new ObjectOutputStream(out);
-			objOut.writeObject(obj);
+			objOut.writeObject(serialObj);
 			objOut.flush();
 			objOut.close();
 			System.out.println("write object success!");
@@ -66,7 +67,7 @@ public class SerialUtil {
 	 *            保存Java对象的文件路径
 	 * @return Java对象
 	 */
-	public static Object readObjectFromFile(String filePath) {
+	public static Serializable readObjectFromFile(String filePath) {
 		return readObjectFromFile(new File(filePath));
 	}
 
@@ -78,16 +79,16 @@ public class SerialUtil {
 	 *            保存Java对象的文件
 	 * @return Java对象
 	 */
-	public static Object readObjectFromFile(File file) {
+	public static Serializable readObjectFromFile(File file) {
 		if (!file.exists()) {
 			return null;
 		}
-		Object temp = null;
+		Serializable temp = null;
 		FileInputStream in;
 		try {
 			in = new FileInputStream(file);
 			ObjectInputStream objIn = new ObjectInputStream(in);
-			temp = objIn.readObject();
+			temp = (Serializable) objIn.readObject();
 			objIn.close();
 			System.out.println("read object success!");
 		} catch (IOException e) {
