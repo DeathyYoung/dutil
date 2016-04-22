@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +30,10 @@ public class FileUtil {
 
 	/** for Path Manipulation */
 	public static final String pathReg = "[a-zA-Z0-9-_:/\\\\]+";
+
+	public static enum CHARSET {
+		UTF8, GBK, UTF16
+	}
 
 	/**
 	 * <p>
@@ -1262,7 +1268,7 @@ public class FileUtil {
 				if (head[0] == -1 && head[1] == -2) {
 					code = "UTF-16";
 				} else if (head[0] == -2 && head[1] == -1) {
-					code = "Unicode";
+					code = "UTF-16";
 				} else if (head[0] == -17 && head[1] == -69 && head[2] == -65) {
 					code = "UTF-8";
 				} else if ("Unicode".equals(code)) {
@@ -1421,5 +1427,101 @@ public class FileUtil {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * 更改文件或文件夹下的字符编码，默认更改为UTF-8
+	 *
+	 * @param path
+	 *            路径
+	 */
+	public static void changeEncode(String path) {
+		changeEncode(path, CHARSET.UTF8);
+	}
+
+	/**
+	 * 更改指定后缀文件或文件夹下指定后缀文件的字符编码，默认更改为UTF-8
+	 *
+	 * @param path
+	 *            路径
+	 * @param charset
+	 *            字符编码
+	 * @param suffixes
+	 *            指定后缀
+	 */
+	private static void changeEncode(String path, CHARSET charset,
+			String... suffixes) {
+		File file = new File(path);
+		if (file.exists()) {
+			if (file.isFile()) {
+				changeEncodeFile(file, charset, suffixes);
+			} else {
+				changeEncodeDir(file, charset, suffixes);
+			}
+		}
+	}
+
+	private static void changeEncodeFile(File file, CHARSET charset) {
+		String[] lines = getLines(file);
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < lines.length; i++) {
+			sb.append(lines[i]);
+			sb.append('\n');
+		}
+		createNewFileForce(file);
+		String code = Charset.forName(charset.name()).toString();
+		FileUtil.addToFile(sb.toString(), file);
+	}
+
+	private static void changeEncodeFile(File file, CHARSET charset,
+			String... suffixes) {
+		boolean flag = false;
+		if (suffixes.length == 0) {
+			flag = true;
+		} else {
+			String suf = file.getName();
+			int index = suf.lastIndexOf('.');
+			index = index >= 0 ? index : 0;
+			suf = suf.substring(index);
+
+			for (String suffix : suffixes) {
+				if (suffix.endsWith(suf)) {
+					flag = true;
+					break;
+				}
+			}
+		}
+		if (flag) {
+			changeEncodeFile(file, charset);
+		}
+	}
+
+	private static void changeEncodeDir(File file, CHARSET charset,
+			String... suffixes) {
+		File[] files = file.listFiles();
+		Set<String> suffixSet = new LinkedHashSet<String>();
+		for (String suffix : suffixes) {
+			suffixSet.add(suffix);
+		}
+		for (File f : files) {
+			if (f.isDirectory()) {
+				changeEncodeDir(file, charset, suffixes);
+			} else if (f.isFile()) {
+				boolean flag = false;
+				if (suffixSet.size() == 0) {
+					flag = true;
+				} else {
+					String suf = f.getName();
+					int index = suf.lastIndexOf('.');
+					index = index >= 0 ? index : 0;
+					suf = suf.substring(index);
+					flag = suffixSet.contains(suf);
+				}
+				if (flag) {
+					changeEncodeFile(f, charset);
+				}
+			}
+		}
+
 	}
 }
