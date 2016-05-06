@@ -27,7 +27,7 @@ import com.deathyyoung.common.util.SecurityUtil;
  * <p>
  * JDBC工具类
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ * @author <a href="#" target="_blank">Deathy
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  */
 public class JDBCUtil {

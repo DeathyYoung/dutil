@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ * @author <a href="#" target="_blank">Deathy
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Mar 2, 2015
  */

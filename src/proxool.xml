@@ -4,7 +4,7 @@
 	<proxool>
 		<!--连接池的别名 -->
 		<alias>test</alias>
-		<!--实现解密的工具类，需要proxool-0.9.1-encrypt.jar来替换proxool-0.9.1.jar -->
+		<!--实现解密的工具类，需要proxool-0.9.1-encrypt-v0.2.jar -->
 		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
 		<!--jdbc的url -->
 		<driver-url>jdbc:mysql://10.15.62.91:3306/test?autoReconnectForPools=true&amp;useUnicode=true&amp;failOverReadOnly=false</driver-url>

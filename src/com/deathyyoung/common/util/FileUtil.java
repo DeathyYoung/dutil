@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -22,8 +21,8 @@ import java.util.Set;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a> (<a
+ *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Feb 24, 2015
  */
 public class FileUtil {
@@ -1469,7 +1468,7 @@ public class FileUtil {
 			sb.append('\n');
 		}
 		createNewFileForce(file);
-		String code = Charset.forName(charset.name()).toString();
+		// String code = Charset.forName(charset.name()).toString();
 		FileUtil.addToFile(sb.toString(), file);
 	}
 
@@ -1505,7 +1504,7 @@ public class FileUtil {
 		}
 		for (File f : files) {
 			if (f.isDirectory()) {
-				changeEncodeDir(file, charset, suffixes);
+				changeEncodeDir(f, charset, suffixes);
 			} else if (f.isFile()) {
 				boolean flag = false;
 				if (suffixSet.size() == 0) {

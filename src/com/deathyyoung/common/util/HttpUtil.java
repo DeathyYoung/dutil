@@ -3,6 +3,7 @@ package com.deathyyoung.common.util;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -11,10 +12,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
-
-import com.deathyyoung.jdbc.util.JDBCUtil;
+import java.util.Properties;
 
 /**
  * @ClassName: HttpUtil
@@ -29,9 +28,11 @@ public class HttpUtil {
 	static {
 		pro = new Properties();
 		try {
-			pro.load(JDBCUtil.class.getResourceAsStream("/mime.properties"));
+			InputStream in = HttpUtil.class
+					.getResourceAsStream("mime.properties");
+			pro.load(in);
 		} catch (IOException e) {
-			System.out.println("未找到配置文件！！！");
+			System.out.println("未找到mime的配置文件！！！");
 		}
 	}
 

@@ -9,7 +9,7 @@ import com.deathyyoung.jdbc.util.JDBCUtil;
  * <p>
  * JDBC工厂类,每个数据库生产一个JDBC单例
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ * @author <a href="#" target="_blank">Deathy
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Apr 16, 2015
  */

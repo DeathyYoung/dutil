@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * <p>
  * Regex Util
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ * @author <a href="#" target="_blank">Deathy
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Jun 23, 2015
  */

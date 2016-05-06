@@ -1,36 +1,26 @@
+
 dutil
 =
-    This is a bag of Java utils, all jars are in dutil-libs, and the source codes are in src.
-    Some codes are written by my friends and some are got from Web. I appreciate them very much. 
-    However, these utils need to be further improved, I hope them could help you in some way. 
+This is a bag of Java utils, **dutil.jar** is in dutil-libs, and the source codes are in src. 
+Some codes are written by my friends and some are got from Web. I appreciate them very much. 
+However, these utils need to be further improved, I hope them could help you in some way. 
     
-    
- - dutil-common.jar<br>
-        *Some common utils like TimeUtil, MathUtil, FileUtil, etc.* 
- 
- - dutil-hibernate.jar<br>
-        *DbDao, HibernateSessionFactory, HibernateSessionFilter, etc.* 
- 
- - dutil-invoke.jar<br>
-        *Invoke in Java Class.* 
+ -  **dutil.jar**<br>
+        *a bag of Java utils, including **TimeUtil**, **MathUtil**, **FileUtil**,  **HibernateSessionFilter**, **JDBCUtil**, **EmailUtil**, **HttpUtil**, etc. * 
+        
+ -  **jdbc.properties**<br>
+        *for database configuration* 
 
- - dutil-jdbc.jar<br>
-        *NO POOL, PROXOOL, C3P0, DBCP.* 
+ -  **c3p0-0.9.5-pre8.jar** and **c3p0-config.xml**<br>
+    *for c3p0 database connection pool* 
+    *c3p0-config.xml for configuration*
 
- - dutil-lucene.jar<br>
-        *Not good now.* 
+ -  **cglib-2.2.jar**, **cglib-nodep-2.1_3.jar**, **proxool-0.9.1-encrypt-v0.2.jar** and **proxool.xml**<br>
+    *for proxool database connection pool, proxool.xml for example* 
+    *proxool.xml for configuration*
 
- - dutil-mail.jar<br>
-        *Easy to send email(QQ email, 163 email...), but not run all email very well.* 
-
- - dutil-office.jar<br>
-        *Need to be improved.* 
-
- - dutil-page.jar<br>
-        *If you need to query a list page by page, this util could help you make it easier with hibernate.* 
- 
- - dutil-web.jar<br>
-        *CharacterEncodingFilter, HTMLUtil, WebUtil, not ready.* 
- 
- -  dutil-full.jar<br>
-        *Contains all above.* 
+ -  **web.xml**<br>
+   *an example for **HibernateSessionFilter** and **SetCharacterEncodingFilter*** 
+   
+ -  **dutil.js**<br>
+   *for web* 

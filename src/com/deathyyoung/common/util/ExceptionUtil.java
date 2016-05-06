@@ -4,8 +4,8 @@ package com.deathyyoung.common.util;
  * <p>
  * ExceptionUtil
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a> (<a
+ *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  */
 public class ExceptionUtil {
 

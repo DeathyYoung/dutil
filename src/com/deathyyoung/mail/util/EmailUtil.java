@@ -11,7 +11,7 @@ import com.deathyyoung.mail.util.SimpleMailSender;
  * <p>
  * Need javax.mail.jar.
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy Young</a>
+ * @author <a href="#" target="_blank">Deathy Young</a>
  *         (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Mar 2, 2015
  */

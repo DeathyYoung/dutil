@@ -6,7 +6,7 @@ import com.deathyyoung.common.bean.PageBean.Button;
  * <p>
  * 分页封装及业务的处理类
  * 
- * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
+ * @author <a href="#" target="_blank">Deathy
  *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  */
 public class PageUtil {
