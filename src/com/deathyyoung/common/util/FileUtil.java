@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -1521,6 +1522,84 @@ public class FileUtil {
 				}
 			}
 		}
-
 	}
+
+	/**
+	 * <p>
+	 * 打开文件
+	 *
+	 * @param in
+	 *            文件路径
+	 * @return 是否成功打开
+	 */
+	public boolean openFile(String path) {
+		return openFile(new File(path));
+	}
+
+	/** InputStreamReader */
+	private InputStreamReader reader;
+	/** BufferedReader */
+	private BufferedReader br;
+
+	/**
+	 * <p>
+	 * 打开文件
+	 *
+	 * @param in
+	 *            文件
+	 * @return 是否成功打开
+	 */
+	public boolean openFile(File in) {
+		if (in == null || !in.exists())
+			return false;
+
+		String charset = FileUtil.getCharset(in);
+		try {
+			reader = new InputStreamReader(new FileInputStream(in), charset);
+			br = new BufferedReader(reader);
+		} catch (UnsupportedEncodingException e) {
+			if (br != null)
+				safeClose(br);
+			if (reader != null)
+				safeClose(reader);
+			e.printStackTrace();
+			return false;
+		} catch (FileNotFoundException e) {
+			if (br != null)
+				safeClose(br);
+			if (reader != null)
+				safeClose(reader);
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * <p>
+	 * 获取下一行文本
+	 *
+	 * @return 下一行文本
+	 */
+	public String nextLine() {
+		try {
+			return br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * <p>
+	 * 关闭文件
+	 *
+	 */
+	public void closeFile() {
+		if (br != null)
+			safeClose(br);
+		if (reader != null)
+			safeClose(reader);
+	}
+
 }

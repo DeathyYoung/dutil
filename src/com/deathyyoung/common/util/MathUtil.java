@@ -341,4 +341,95 @@ public class MathUtil {
 	public static String getScale(String v1, int scale) {
 		return getScale(new BigDecimal(v1), scale).toString();
 	}
+
+	/**
+	 * <p>
+	 * 计算余弦距离
+	 *
+	 * @param vec1
+	 *            第一个向量
+	 * @param vec2
+	 *            第二个向量
+	 * @return 余弦距离
+	 */
+	public static double cosDistance(double[] vec1, double[] vec2) {
+		double ab = 0;
+		double aa = 0;
+		double bb = 0;
+		for (int i = 0; i < vec1.length; i++) {
+			ab += vec1[i] * vec2[i];
+			aa += vec1[i] * vec1[i];
+			bb += vec2[i] * vec2[i];
+		}
+		if (ab == 0) {
+			return 0;
+		}
+		return ab / Math.sqrt(aa * bb);
+	}
+
+	/**
+	 * <p>
+	 * 计算欧拉距离
+	 *
+	 * @param vec1
+	 *            第一个向量
+	 * @param vec2
+	 *            第二个向量
+	 * @return 欧拉距离
+	 */
+	public static double eulerDistance(double[] vec1, double[] vec2) {
+		double dis = 0;
+		for (int i = 0; i < vec1.length; i++) {
+			dis += vec1[i] * vec2[i];
+		}
+		if (dis == 0) {
+			return 0;
+		} else {
+			return Math.sqrt(dis);
+		}
+	}
+
+	/**
+	 * <p>
+	 * 归一化向量
+	 *
+	 * @param vec
+	 *            初始向量
+	 * @return 归一化后的向量
+	 */
+	public static double[] normalize(double[] vec) {
+		double len = 0;
+		for (int i = 0; i < vec.length; i++) {
+			len += vec[i] * vec[i];
+		}
+		if (len > 0) {
+			len = Math.sqrt(len);
+			for (int i = 0; i < vec.length; i++) {
+				vec[i] /= len;
+			}
+		}
+		return vec;
+	}
+
+	/**
+	 * <p>
+	 * 归一化向量
+	 *
+	 * @param vec
+	 *            初始向量
+	 * @return 归一化后的向量
+	 */
+	public static float[] normalize(float[] vec) {
+		double len = 0;
+		for (int i = 0; i < vec.length; i++) {
+			len += vec[i] * vec[i];
+		}
+		if (len > 0) {
+			len = Math.sqrt(len);
+			for (int i = 0; i < vec.length; i++) {
+				vec[i] /= len;
+			}
+		}
+		return vec;
+	}
 }
