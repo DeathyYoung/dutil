@@ -366,6 +366,82 @@ public class MathUtil {
 		}
 		return ab / Math.sqrt(aa * bb);
 	}
+	
+
+	/**
+	 * <p>
+	 * 计算余弦距离
+	 *
+	 * @param vec1
+	 *            第一个向量
+	 * @param vec2
+	 *            第二个向量
+	 * @return 余弦距离
+	 */
+	public static double cosDistance(float[] vec1, float[] vec2) {
+		double ab = 0;
+		double aa = 0;
+		double bb = 0;
+		for (int i = 0; i < vec1.length; i++) {
+			ab += vec1[i] * vec2[i];
+			aa += vec1[i] * vec1[i];
+			bb += vec2[i] * vec2[i];
+		}
+		if (ab == 0) {
+			return 0;
+		}
+		return ab / Math.sqrt(aa * bb);
+	}
+	
+	/**
+	 * <p>
+	 * 计算余弦距离
+	 *
+	 * @param vec1
+	 *            第一个向量
+	 * @param vec2
+	 *            第二个向量
+	 * @return 余弦距离
+	 */
+	public static double cosDistance(long[] vec1, long[] vec2) {
+		double ab = 0;
+		double aa = 0;
+		double bb = 0;
+		for (int i = 0; i < vec1.length; i++) {
+			ab += vec1[i] * vec2[i];
+			aa += vec1[i] * vec1[i];
+			bb += vec2[i] * vec2[i];
+		}
+		if (ab == 0) {
+			return 0;
+		}
+		return ab / Math.sqrt(aa * bb);
+	}
+	
+	/**
+	 * <p>
+	 * 计算余弦距离
+	 *
+	 * @param vec1
+	 *            第一个向量
+	 * @param vec2
+	 *            第二个向量
+	 * @return 余弦距离
+	 */
+	public static double cosDistance(int[] vec1, int[] vec2) {
+		double ab = 0;
+		double aa = 0;
+		double bb = 0;
+		for (int i = 0; i < vec1.length; i++) {
+			ab += vec1[i] * vec2[i];
+			aa += vec1[i] * vec1[i];
+			bb += vec2[i] * vec2[i];
+		}
+		if (ab == 0) {
+			return 0;
+		}
+		return ab / Math.sqrt(aa * bb);
+	}
 
 	/**
 	 * <p>

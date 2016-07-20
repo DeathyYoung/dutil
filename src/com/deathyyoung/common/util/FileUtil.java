@@ -171,6 +171,9 @@ public class FileUtil {
 		try {
 			beginIndex = beginIndex < 0 ? 0 : beginIndex;
 			endIndex = endIndex > contents.length ? contents.length : endIndex;
+			if(!file.exists()){
+				createNewFileForce(file);
+			}
 			fw = new FileWriter(file, true);
 			for (int i = beginIndex; i < endIndex; i++) {
 				fw.write(contents[i]);
@@ -247,6 +250,8 @@ public class FileUtil {
 	public static boolean addToFileln(String content, File file) {
 		FileWriter fw = null;
 		try {
+			if (!file.exists())
+				createNewFileForce(file);
 			fw = new FileWriter(file, true);
 			fw.write(content);
 			fw.write("\n");
@@ -299,6 +304,8 @@ public class FileUtil {
 			int endIndex, File file) {
 		FileWriter fw = null;
 		try {
+			if (!file.exists())
+				createNewFileForce(file);
 			fw = new FileWriter(file, true);
 			for (int i = beginIndex; i < endIndex; i++) {
 				fw.write(contents[i]);
@@ -487,6 +494,7 @@ public class FileUtil {
 		try {
 			fw = new FileWriter(file, true);
 			fos = new FileOutputStream(file);
+			fos.write(new byte[] { -17, -69, -65 });// BOM
 			for (int i = 0; i < fileLength / 4096; i++) {
 				byte[] buffer = new byte[4096 * 1024];
 				fos.write(buffer);

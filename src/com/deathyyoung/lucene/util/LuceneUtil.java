@@ -31,8 +31,8 @@ import org.apache.lucene.util.ReaderUtil;
 
 /**
  * 
- * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a> (<a
+ *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Mar 9, 2015
  */
 @SuppressWarnings("unchecked")
@@ -45,12 +45,15 @@ public class LuceneUtil {
 	/** IndexReader */
 	private IndexReader reader;
 
+	/** 文档计数 */
+	private int docCount;
+
 	/**
 	 * <p>
 	 * 查询方式
 	 * 
-	 * @author <a href="#" target="_blank">Deathy
-	 *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+	 * @author <a href="#" target="_blank">Deathy Young</a> (<a
+	 *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
 	 */
 	public static enum QueryMethod {
 		Term, Wildcard
@@ -121,6 +124,38 @@ public class LuceneUtil {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	/**
+	 * <p>
+	 * 获取所有文档
+	 *
+	 * @return 所有文档
+	 */
+	public Document getNextDoc() {
+		Document doc = null;
+		if (docCount >= reader.numDocs()) {
+			docCount = 0;
+			return doc;
+		}
+		try {
+			doc = reader.document(docCount);
+			docCount++;
+		} catch (CorruptIndexException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return doc;
+	}
+
+	/**
+	 * <p>
+	 * 重置计数
+	 *
+	 */
+	public void resetDocIndex() {
+		docCount = -1;
 	}
 
 	/**
@@ -398,6 +433,16 @@ public class LuceneUtil {
 	public int find(String fld, String key, int topN) {
 		Query wQuery = new WildcardQuery(new Term(fld, "*" + key + "*"));
 		return find(wQuery, topN);
+	}
+
+	public int find(String fld, String key, int topN, QueryMethod qm) {
+		Query query = null;
+		if (qm == QueryMethod.Wildcard) {
+			query = new WildcardQuery(new Term(fld, "*" + key + "*"));
+		} else {
+			query = new TermQuery(new Term(fld, key));
+		}
+		return find(query, topN);
 	}
 
 	public String[] query(String fld, String key) {
