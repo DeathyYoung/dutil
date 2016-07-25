@@ -35,6 +35,28 @@ public class FileUtil {
 		UTF8, GBK, UTF16
 	}
 
+	/** linefeed */
+	public static String linefeed;
+	/** isWindows */
+	public static boolean isWindows;
+
+	/** byte order mark */
+	public final static byte[] BOM = { -17, -69, -65 };
+
+	static {
+		String osName = System.getProperties().getProperty("os.name")
+				.toLowerCase();
+		isWindows = false;
+		if (osName.contains("windows")) {
+			isWindows = true;
+			linefeed = "\r\n";
+		} else if (osName.contains("mac")) {
+			linefeed = "\r";
+		} else {
+			linefeed = "\n";
+		}
+	}
+
 	/**
 	 * <p>
 	 * Wheter the <code>path</code> is valided.
@@ -171,7 +193,7 @@ public class FileUtil {
 		try {
 			beginIndex = beginIndex < 0 ? 0 : beginIndex;
 			endIndex = endIndex > contents.length ? contents.length : endIndex;
-			if(!file.exists()){
+			if (!file.exists()) {
 				createNewFileForce(file);
 			}
 			fw = new FileWriter(file, true);
@@ -254,7 +276,7 @@ public class FileUtil {
 				createNewFileForce(file);
 			fw = new FileWriter(file, true);
 			fw.write(content);
-			fw.write("\n");
+			fw.write(linefeed);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
@@ -309,7 +331,7 @@ public class FileUtil {
 			fw = new FileWriter(file, true);
 			for (int i = beginIndex; i < endIndex; i++) {
 				fw.write(contents[i]);
-				fw.write("\n");
+				fw.write(linefeed);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -494,7 +516,9 @@ public class FileUtil {
 		try {
 			fw = new FileWriter(file, true);
 			fos = new FileOutputStream(file);
-			fos.write(new byte[] { -17, -69, -65 });// BOM
+			if (isWindows && file.getName().toLowerCase().endsWith(".txt")) {
+				fos.write(BOM);
+			}
 			for (int i = 0; i < fileLength / 4096; i++) {
 				byte[] buffer = new byte[4096 * 1024];
 				fos.write(buffer);
@@ -1474,7 +1498,7 @@ public class FileUtil {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < lines.length; i++) {
 			sb.append(lines[i]);
-			sb.append('\n');
+			sb.append(linefeed);
 		}
 		createNewFileForce(file);
 		// String code = Charset.forName(charset.name()).toString();

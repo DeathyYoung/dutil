@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a> (<a
+ *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class TimeUtil {
@@ -198,8 +198,11 @@ public class TimeUtil {
 	 * <P>
 	 * Description: 得到计数值
 	 */
-	public String getCountdown() {
-		return new Date().getTime() - date.getTime() + "ms";
+	public long getCountdown() {
+		Date d = new Date();
+		long time = d.getTime() - date.getTime();
+		date = d;
+		return time;
 	}
 
 	/**
