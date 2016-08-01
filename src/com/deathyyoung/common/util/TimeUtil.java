@@ -206,6 +206,41 @@ public class TimeUtil {
 	}
 
 	/**
+	 * Title: getCountdown
+	 * <P>
+	 * Description: 得到计数时间
+	 */
+	public String showCountdown() {
+		long ms = getCountdown();
+		StringBuffer sb = new StringBuffer();
+		long second = ms / 1000;
+		ms = ms % 1000;
+		long minite = second / 60;
+		second = second % 60;
+		sb.insert(0, "ms");
+		sb.insert(0, ms);
+		sb.insert(0, "s");
+		sb.insert(0, second);
+		if (minite > 0) {
+			long h = minite / 60;
+			minite = minite % 60;
+			sb.insert(0, "m");
+			sb.insert(0, minite);
+			if (h > 0) {
+				long d = h / 24;
+				h = h % 24;
+				sb.insert(0, "h");
+				sb.insert(0, h);
+				if (d > 0) {
+					sb.insert(0, "d");
+					sb.insert(0, d);
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * @param start
 	 * @param end
 	 * @return long

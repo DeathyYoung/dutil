@@ -8,13 +8,12 @@ public class FileTest {
 
 		String path = "F:\\account.txt";
 
-		FileUtil fu = new FileUtil();
-		fu.openFile(path);
-		String str = null;
-		while ((str = fu.nextLine()) != null) {
+		
+		System.out.println(FileUtil.getLines(path)[0].length());
+		
+		for(String str : FileUtil.getLines(path)){
 			System.out.println(str);
 		}
-		fu.closeFile();
 	}
 
 }

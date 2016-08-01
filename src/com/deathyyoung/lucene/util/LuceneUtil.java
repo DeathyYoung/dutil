@@ -40,10 +40,10 @@ public class LuceneUtil {
 
 	/** index's directory */
 	private Directory dir;
-	/** IndexSearcher */
-	private IndexSearcher searcher;
 	/** IndexReader */
 	private IndexReader reader;
+	/** IndexSearcher */
+	private IndexSearcher searcher;
 
 	/** 文档计数 */
 	private int docCount;
@@ -545,6 +545,24 @@ public class LuceneUtil {
 			}
 		}
 		return max;
+	}
+
+	/**
+	 * <p>
+	 * close the lucene
+	 *
+	 * @return result
+	 */
+	public boolean close() {
+		try {
+			searcher.close();
+			reader.close();
+			dir.close();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }
