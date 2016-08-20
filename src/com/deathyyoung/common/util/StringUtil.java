@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 
  * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Jun 16, 2015
  */
 public class StringUtil {

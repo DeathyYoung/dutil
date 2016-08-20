@@ -14,7 +14,7 @@ public class PageBean {
 	 * PageBean里按钮类型枚举，首页、上一页、下一页、尾页
 	 * 
 	 * @author <a href="#" target="_blank">Deathy
-	 *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+	 *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
 	 */
 	public enum Button {
 		FirstPage, PrePage, NextPage, LastPage

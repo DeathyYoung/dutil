@@ -19,6 +19,13 @@ import sun.misc.BASE64Encoder;
  */
 public class DecUtil implements Decryptool {
 
+	/**
+	 * <p>
+	 * 解密
+	 *
+	 * @param 待解密的字符串
+	 * @return 解密后的字符串
+	 */
 	@Override
 	public String decrypt(String string) {
 		BASE64Decoder decode = new BASE64Decoder();
@@ -35,10 +42,10 @@ public class DecUtil implements Decryptool {
 
 	/**
 	 * <p>
-	 * 解密
+	 * 加密
 	 *
-	 * @param 待解密的字符串
-	 * @return 解密后的字符串
+	 * @param 待加密的字符串
+	 * @return 加密后的字符串
 	 */
 	public String encrypt(String string) {
 		BASE64Encoder encode = new BASE64Encoder();

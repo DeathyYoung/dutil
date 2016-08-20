@@ -13,7 +13,7 @@ import com.opensymphony.xwork2.ActionSupport;
 /**
 * <p> 依赖org.hibernate.Session
 * 
-* @author <a href="#" target="_blank">Deathy Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+* @author <a href="#" target="_blank">Deathy Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
 */ 
 public class CommonAction extends ActionSupport implements ServletRequestAware {
 

@@ -23,7 +23,7 @@ import javax.imageio.stream.ImageInputStream;
 
 /**
  * @author <a href="#" target="_blank">Deathy Young</a> (<a
- *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Feb 24, 2015
  */
 public class FileUtil {

@@ -16,7 +16,7 @@ import org.jsoup.parser.Tag;
  * Need jsoup-1.8.1.jar.
  * 
  * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class HtmlUtil {

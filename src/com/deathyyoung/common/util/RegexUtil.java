@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * Regex Util
  * 
  * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Jun 23, 2015
  */
 public class RegexUtil {

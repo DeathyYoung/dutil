@@ -3,36 +3,78 @@
 
 	<proxool>
 		<!--连接池的别名 -->
-		<alias>test</alias>
-		<!--实现解密的工具类，需要proxool-0.9.1-encrypt.jar -->
+		<alias>demo</alias>
+		<!--实现加密解密的工具类，需要 proxool-0.9.1-encrypt-v0.2.jar -->
 		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
 		<!--jdbc的url -->
-		<driver-url>jdbc:mysql://10.15.62.91:3306/test?autoReconnectForPools=true&amp;useUnicode=true&amp;failOverReadOnly=false</driver-url>
+		<driver-url>jdbc:mysql://127.0.0.1:3306/demo?autoReconnectForPools=true&amp;autoReconnect=true&amp;useUnicode=true&amp;failOverReadOnly=false
+		</driver-url>
 		<!--jdbc驱动 -->
 		<driver-class>com.mysql.jdbc.Driver</driver-class>
 		<driver-properties>
-			<property name="user" value="ZGVhdGh5YmxvZw==" />
-			<property name="password" value="bWFwbGUzNTc=" />
+			<property name="user" value="dXNlcg==" />
+			<property name="password" value="cGFzc3dvcmQ=" />
 		</driver-properties>
-		<!-- house keeper 保留线程处于睡眠状态的最长时间,house keeper 的职责就是检查各个连接的状态,并判断是否需要销毁或者创建. -->
-		<house-keeping-sleep-time>300000</house-keeping-sleep-time>
-		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
-		<maximum-active-time>60000</maximum-active-time>
-		<!-- 如果housekeeper 检测到某个线程的活动时间大于这个数值.它将会杀掉这个线程. 所以确认一下你的服务器的带宽.然后定一个合适的值.默认是5分钟. -->
-		<maximum-connection-lifetime>300000</maximum-connection-lifetime>
-		<!-- 如果侦察线程发现闲置连接，则会使用这个SQL语句来对这些连接进行检查 -->
-		<property name="houseKeepingTestSql" value="select CURRENT_DATE" />
 		<!-- 最大的数据库连接数 -->
-		<maximum-connection-count>255</maximum-connection-count>
-		<!-- 最小的数据库连接数 -->
-		<minimum-connection-count>10</minimum-connection-count>
-		<!-- 连接池中可用的连接数量 -->
-		<prototype-count>10</prototype-count>
-		<!-- 同时最大连接数 -->
-		<simultaneous-build-throttle>10</simultaneous-build-throttle>
+		<maximum-connection-count>839</maximum-connection-count>
+		<!-- 最小的数据库连接数，包含活动连接和可用连接[prototype-count] -->
+		<minimum-connection-count>100</minimum-connection-count>
+		<!-- 连接池中可用的连接数量，不要超过 minimum-connection-count -->
+		<prototype-count>5</prototype-count>
+		<!-- 并发、同时最大连接数 -->
+		<simultaneous-build-throttle>100</simultaneous-build-throttle>
+
+		<!-- 下面的参数如果不了解就不要修改了 -->
+
+		<!-- 如果一个线程活动时间超过这个数值，线程会被杀死。 所以要确保这个数值设置得比最慢的响应时间长。默认是5分钟。 守护进程会把连接池中多余的可用线程（未用的、超过这个时间的）杀死， 
+			最终保留的连接数量就是minimum-connection-count规定的数量。 守护进程会根据house-keeping-sleep-time参数设置的时间隔定时检查。 -->
+		<maximum-active-time>300000</maximum-active-time>
+		<!-- 指一个连接最大的存活时间（毫秒为单位），超过这个时间，连接会被杀死。默认值是4小时。 -->
+		<maximum-connection-lifetime>1800000</maximum-connection-lifetime>
+		<!-- 这个参数帮助我们确定连接池的状态，如果在这个时间阀值内（单位为毫秒）拒绝了一个连接，就认为是过载了。默认值是60。 -->
+		<overload-without-refusal-lifetime>60</overload-without-refusal-lifetime>
+		<!-- house keeper 保留线程处于睡眠状态的最长时间,house keeper 的职责就是检查各个连接的状态,并判断是否需要销毁或者创建。 
+			侦察到空闲的连接就马上回收,超时的销毁 默认30秒). -->
+		<house-keeping-sleep-time>5000</house-keeping-sleep-time>
+		<!-- 如果发现了空闲的数据库连接.house keeper 将会用这个语句来测试.这个语句最好非常快的被执行.如果没有定义,测试过程将会被忽略。 -->
+		<house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>
+		<!-- 如果连接池在运行当中，出现网络或者数据库故障而无法连接到数据库， 在恢复正常以后，由于连接是在连接池中持久保存的，会出现连接仍然不可用的情况。 
+			这时连接池里的连接实际上都是坏连接，怎么让连接池可以自动重连清除这些坏连接呢？ 只要配置了test-before-use 参数，即每次取出连接都检查连接是否可用， 
+			就可以做到让连接池实现在故障恢复后自动重连接。 需要注意一点，对于Mysql数据库还必须在连接参数里加上autoReconnect=true 参数， 
+			否则即使打开了test-before-use 参数，仍然不能重连接！ -->
+		<test-before-use>true</test-before-use>
 		<!-- 连接池使用状况统计 -->
 		<statistics>10m,1h,1d</statistics>
 		<!-- 日志统计跟踪类型。 参数“ERROR”或 “INFO” -->
-		<statistics-log-level>INFO</statistics-log-level>
+		<statistics-log-level>ERROR</statistics-log-level>
 	</proxool>
+	
+	
+	<proxool>
+		<alias>demo2</alias>
+		<encrypt>com.deathyyoung.jdbc.proxool.DecUtil</encrypt>
+		<driver-url>jdbc:mysql://127.0.0.1:3306/demo?autoReconnectForPools=true&amp;autoReconnect=true&amp;useUnicode=true&amp;failOverReadOnly=false
+		</driver-url>
+		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="dXNlcg==" />
+			<property name="password" value="cGFzc3dvcmQ=" />
+		</driver-properties>
+		<maximum-connection-count>839</maximum-connection-count>
+		<minimum-connection-count>100</minimum-connection-count>
+		<prototype-count>5</prototype-count>
+		<simultaneous-build-throttle>100</simultaneous-build-throttle>
+
+		<!-- 下面的参数如果不了解就不要修改了 -->
+
+		<maximum-active-time>300000</maximum-active-time>
+		<maximum-connection-lifetime>1800000</maximum-connection-lifetime>
+		<overload-without-refusal-lifetime>60</overload-without-refusal-lifetime>
+		<house-keeping-sleep-time>5000</house-keeping-sleep-time>
+		<house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>
+		<test-before-use>true</test-before-use>
+		<statistics>10m,1h,1d</statistics>
+		<statistics-log-level>ERROR</statistics-log-level>
+	</proxool>
+
 </proxool-config>

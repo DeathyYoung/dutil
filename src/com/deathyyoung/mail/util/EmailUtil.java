@@ -12,7 +12,7 @@ import com.deathyyoung.mail.util.SimpleMailSender;
  * Need javax.mail.jar.
  * 
  * @author <a href="#" target="_blank">Deathy Young</a>
- *         (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class EmailUtil {
@@ -74,7 +74,7 @@ public class EmailUtil {
 	}
 
 	public void sentEmailwithStop() {
-		sentEmail("mapleyeh@qq.com", "运行停止");
+		sentEmail("deathyyoung@qq.com", "运行停止");
 	}
 
 	public void sentEmail(String toAddress, String content) {

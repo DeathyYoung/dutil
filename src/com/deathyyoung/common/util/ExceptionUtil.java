@@ -5,7 +5,7 @@ package com.deathyyoung.common.util;
  * ExceptionUtil
  * 
  * @author <a href="#" target="_blank">Deathy Young</a> (<a
- *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  */
 public class ExceptionUtil {
 

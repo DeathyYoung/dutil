@@ -15,7 +15,7 @@ However, these utils need to be further improved, I hope them could help you in 
     *for c3p0 database connection pool* 
     *c3p0-config.xml for configuration*
 
- -  **cglib-2.2.jar**, **cglib-nodep-2.1_3.jar**, **proxool-0.9.1-encrypt-v0.2.jar** and **proxool.xml**<br>
+ -  **asm-3.3.jar**, **cglib-nodep-2.1_3.jar**, **commons-logging-1.1.3.jar**, **mysql-connector-java-5.xx-bin.jar**, **proxool-0.9.1-encrypt-v0.2.jar** and **proxool.xml**<br>
     *for proxool database connection pool, proxool.xml for example* 
     *proxool.xml for configuration*
 

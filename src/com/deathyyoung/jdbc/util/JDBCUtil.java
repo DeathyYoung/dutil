@@ -22,13 +22,14 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 
 import com.deathyyoung.common.util.SecurityUtil;
+import com.deathyyoung.jdbc.factory.JDBCFactory;
 
 /**
  * <p>
  * JDBC工具类
  * 
- * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a> (
+ *         <a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  */
 public class JDBCUtil {
 
@@ -86,6 +87,8 @@ public class JDBCUtil {
 	 */
 	private static int maxWait;
 
+	/** 指定超时时间，单位：秒。超过该时间后如果链接满了，会销毁超时的空闲链接 */
+	private static int overtime;
 	/**
 	 * <p>
 	 * 数据库配置项的名字
@@ -108,7 +111,11 @@ public class JDBCUtil {
 	private C3P0Util cu;
 
 	/** 重连次数 */
-	private static final int RETRY_COUNT = 5;
+	private static final int RETRY_COUNT = 10;
+
+	/** 重连等待时间，单位毫秒 */
+	private static final int WAITING_RECONNECT_TIME = 10000;
+	private static String[] freeAlias;
 
 	static {
 		Properties pro = new Properties();
@@ -118,6 +125,21 @@ public class JDBCUtil {
 			System.out.println("未找到配置文件！！！");
 		}
 		pool = POOL.valueOf(pro.getProperty("pool"));
+
+		{// @deprecated
+			String overtimeStr = pro.getProperty("overtime");
+			if (overtimeStr != null && overtimeStr.trim().length() > 0) {
+				overtimeStr = overtimeStr.trim();
+				if (overtimeStr.matches("[0-9]+")) {
+					overtime = Integer.parseInt(overtimeStr);
+				}
+			}
+
+			String freeAliasStr = pro.getProperty("freeAlias");
+			if (freeAliasStr != null && freeAliasStr.trim().length() > 0) {
+				freeAlias = pro.getProperty("freeAlias").split("[,，]");
+			}
+		}
 
 		switch (pool) {
 		case NONE:
@@ -156,35 +178,22 @@ public class JDBCUtil {
 
 	public JDBCUtil(String alias) {
 		this.alias = alias;
-		try {
-			switch (pool) {
-			case NONE:
-				System.out.println("不使用连接池");
-				Class.forName(driverPath);
-				conn = DriverManager.getConnection(url, user, password);
-				break;
-			case C3P0:
-				cu = new C3P0Util();
-				System.out.println("使用C3P0连接池");
-				cu.openDataSource();
-				conn = cu.getDataSource().getConnection();
-				break;
-			case PROXOOL:
-				System.out.println("使用PROXOOL连接池");
-				conn = DriverManager.getConnection("proxool." + alias);
-				break;
-			case DBCP:
-				System.out.println("使用DBCP连接池");
-				conn = DBCPUtil.initDS(url, user, password, driverPath,
-						initialSize, maxActive, maxIdle, maxWait)
-						.getConnection();
-			default:
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+
+		switch (pool) {
+		case NONE:
+			break;
+		case C3P0:
+			System.out.println("使用C3P0连接池");
+			break;
+		case PROXOOL:
+			System.out.println("使用PROXOOL连接池");
+			break;
+		case DBCP:
+			System.out.println("使用DBCP连接池");
+		default:
 		}
+
+		open();
 	}
 
 	/**
@@ -194,6 +203,18 @@ public class JDBCUtil {
 	 * @return 连接
 	 */
 	public Connection reOpen() {
+		System.out.println("re open [" + retryCount + "]");
+		retryCount--;
+		if (retryCount <= 0) {
+			try {
+				retryCount = RETRY_COUNT;
+				System.out.println("Connection full: waiting...");
+				// free();
+				Thread.sleep(WAITING_RECONNECT_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		try {
 			switch (pool) {
 			case NONE:
@@ -209,15 +230,23 @@ public class JDBCUtil {
 				conn = DriverManager.getConnection("proxool." + alias);
 				break;
 			case DBCP:
-				conn = DBCPUtil.initDS(url, user, password, driverPath,
-						initialSize, maxActive, maxIdle, maxWait)
+				conn = DBCPUtil.initDS(url, user, password, driverPath, initialSize, maxActive, maxIdle, maxWait)
 						.getConnection();
 				break;
 			default:
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			// } catch (MySQLNonTransientConnectionException e) {
+			// reOpen();
 		} catch (SQLException e) {
+			reOpen();
+			// String sqlState = e.getSQLState();
+			// if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
+			// reOpen();
+			// } else {
+			// retryCount = 0;
+			// e.printStackTrace();
+			// }
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return conn;
@@ -248,17 +277,19 @@ public class JDBCUtil {
 	 */
 	private void close() {
 		try {
-			switch (pool) {
-			case NONE:
-				conn.close();
-				break;
-			// 连接池管理是否关闭连接
-			case C3P0:
-			case PROXOOL:
-			case DBCP:
-				break;
-			default:
-			}
+			// switch (pool) {
+			// case NONE:
+			// conn.close();
+			// break;
+			// // 连接池管理是否关闭连接
+			// case C3P0:
+			// case PROXOOL:
+			// break;
+			// case DBCP:
+			// break;
+			// default:
+			// }
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -297,8 +328,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -346,8 +376,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -362,14 +391,7 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} finally {
 				close();
 			}
@@ -393,14 +415,7 @@ public class JDBCUtil {
 				pstmt = conn.prepareStatement(sql);
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			}
 		} while (retryCount > 0);
 		return pstmt;
@@ -411,14 +426,14 @@ public class JDBCUtil {
 	 * 从数据库提取文件
 	 *
 	 * @param sql
-	 *            　
+	 * 
+	 * 
 	 * @param filePath
 	 * @param blobColumnName
 	 * @param objs
-	 * @return　是否提取成功
+	 * @return 是否提取成功
 	 */
-	public boolean loadFromDatabase(String sql, String filePath,
-			String blobColumnName, Object... objs) {
+	public boolean loadFromDatabase(String sql, String filePath, String blobColumnName, Object... objs) {
 		FileOutputStream output = null;
 		open();
 		do {
@@ -426,8 +441,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -460,14 +474,7 @@ public class JDBCUtil {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -485,10 +492,8 @@ public class JDBCUtil {
 	 * @param obj
 	 * @return LinkedList<String[]>搜索分页结果
 	 */
-	public LinkedList<String[]> executeQueryPagingToString(String sql,
-			String page, int perCount, Object... obj) {
-		return executeQueryPagingToString(sql, Integer.parseInt(page),
-				perCount, obj);
+	public LinkedList<String[]> executeQueryPagingToString(String sql, String page, int perCount, Object... obj) {
+		return executeQueryPagingToString(sql, Integer.parseInt(page), perCount, obj);
 	}
 
 	/**
@@ -501,8 +506,7 @@ public class JDBCUtil {
 	 * @param obj
 	 * @return LinkedList<String[]>搜索分页结果
 	 */
-	public LinkedList<String[]> executeQueryPagingToString(String sql,
-			int page, int perCount, Object... obj) {
+	public LinkedList<String[]> executeQueryPagingToString(String sql, int page, int perCount, Object... obj) {
 		LinkedList<String[]> aList = executeQueryToStrings(sql, obj);
 		aList = new LinkedList<String[]>();
 		sql += " limit ?, ?";
@@ -521,8 +525,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -546,14 +549,7 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -594,27 +590,18 @@ public class JDBCUtil {
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof File) {
 						File file = (File) objs[i];
-						pstmt.setBinaryStream(i + 1, new DataInputStream(
-								new FileInputStream(file)), (int) file.length());
+						pstmt.setBinaryStream(i + 1, new DataInputStream(new FileInputStream(file)),
+								(int) file.length());
 						continue;
-					} else if (objs[i] != null
-							&& objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+					} else if (objs[i] != null && objs[i] instanceof java.lang.String) {
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
 				line = pstmt.executeUpdate();
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} finally {
@@ -634,8 +621,7 @@ public class JDBCUtil {
 	 *            参数值
 	 * @return 查询结果
 	 */
-	public LinkedList<Map<String, Object>> executeQuery(String sql,
-			Object... objs) {
+	public LinkedList<Map<String, Object>> executeQuery(String sql, Object... objs) {
 		LinkedList<Map<String, Object>> aList = new LinkedList<Map<String, Object>>();
 		open();
 		do {
@@ -643,8 +629,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -683,35 +668,71 @@ public class JDBCUtil {
 
 				rs.close();
 				rs = null;
-				// if (pstmt == null) {
-				// System.out.println("pstmt is null");
-				// } else {
-				// System.out.println((pstmt == null));
-				// if (pstmt.isClosed()) {
-				// System.out.println(1);
-				// } else {
-				// System.out.println(0);
-				// }
-				// // System.out.println((pstmt.isCloseOnCompletion()));
-				// // System.out.println((pstmt.isPoolable()));
-				// }
 				pstmt.close();
 				pstmt = null;
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
-				// } finally {
-				// close();
+				reOpen();
+			} finally {
+				close();
 			}
 		} while (retryCount > 0);
 		return aList;
+	}
+
+	/**
+	 * <p>
+	 * 销毁超时的链接，使用指定的alias=freeSleepConn
+	 * 
+	 * @deprecated
+	 */
+	@SuppressWarnings("unused")
+	private void free() {
+		for (String alias : freeAlias) {
+			JDBCUtil juFree = JDBCFactory.getJDBCUtil(alias);
+			juFree.freeSleepConn();
+		}
+	}
+
+	/**
+	 * <p>
+	 * 销毁超时的链接
+	 * 
+	 * @deprecated
+	 *
+	 * @return 是否成功
+	 */
+	private boolean freeSleepConn() {
+		open();
+		do {
+			try {
+				System.out.println("free idle connection");
+				PreparedStatement pstmt = conn.prepareStatement("show processlist");
+				ResultSet rs = pstmt.executeQuery();
+
+				LinkedList<Object> ids = new LinkedList<Object>();
+				while (rs.next()) {// 遍历结果集
+					int id = rs.getInt("Id");
+					String command = rs.getString("Command");
+					int time = rs.getInt("Time");
+					if (command.equals("Sleep") && time >= overtime) {
+						ids.add(id);
+					}
+				}
+
+				rs.close();
+				rs = null;
+				pstmt.close();
+				pstmt = null;
+				retryCount = 0;
+				executeBatch("kill ?", 1, ids);
+			} catch (SQLException e) {
+				reOpen();
+			} finally {
+				close();
+			}
+		} while (retryCount > 0);
+		return true;
 	}
 
 	/**
@@ -724,8 +745,7 @@ public class JDBCUtil {
 	 *            参数值
 	 * @return 查询结果
 	 */
-	public LinkedList<String[]> executeQueryToStrings(String sql,
-			Object... objs) {
+	public LinkedList<String[]> executeQueryToStrings(String sql, Object... objs) {
 		LinkedList<String[]> aList = new LinkedList<String[]>();
 		open();
 		do {
@@ -733,8 +753,7 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -756,14 +775,7 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -792,13 +804,11 @@ public class JDBCUtil {
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof File) {
 						File file = (File) objs[i];
-						pstmt.setBinaryStream(i + 1, new DataInputStream(
-								new FileInputStream(file)), (int) file.length());
+						pstmt.setBinaryStream(i + 1, new DataInputStream(new FileInputStream(file)),
+								(int) file.length());
 						continue;
-					} else if (objs[i] != null
-							&& objs[i] instanceof java.lang.String) {
-						objs[i] = SecurityUtil.sqlValueFilter(objs[i]
-								.toString());
+					} else if (objs[i] != null && objs[i] instanceof java.lang.String) {
+						objs[i] = SecurityUtil.sqlValueFilter(objs[i].toString());
 					}
 					pstmt.setObject(i + 1, objs[i]);
 				}
@@ -806,14 +816,7 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				String sqlState = e.getSQLState();
-				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
-					reOpen();
-				} else {
-					retryCount = 0;
-					e.printStackTrace();
-				}
+				reOpen();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} finally {
@@ -837,8 +840,7 @@ public class JDBCUtil {
 	 *            参数值
 	 * @return 影响的行数
 	 */
-	public int[] executeBatch(String sql, int valueNumber,
-			LinkedList<Object> values) {
+	public synchronized int[] executeBatch(String sql, int valueNumber, LinkedList<Object> values) {
 		int[] lines = null;
 		open();
 		try {
@@ -851,12 +853,8 @@ public class JDBCUtil {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < values.size(); i = i + valueNumber) {
 					for (int j = 0; j < valueNumber; j++) {
-						if (values.get(i + j) != null
-								&& values.get(i + j) instanceof java.lang.String) {
-							values.set(
-									i + j,
-									SecurityUtil.sqlValueFilter(values.get(
-											i + j).toString()));
+						if (values.get(i + j) != null && values.get(i + j) instanceof java.lang.String) {
+							values.set(i + j, SecurityUtil.sqlValueFilter(values.get(i + j).toString()));
 						}
 						pstmt.setObject(j + 1, values.get(i + j));
 					}
@@ -869,7 +867,6 @@ public class JDBCUtil {
 			} catch (SQLException e) {
 				String sqlState = e.getSQLState();
 				if ("08S01".equals(sqlState) || "40001".equals(sqlState)) {
-					retryCount--;
 					reOpen();
 				} else {
 					retryCount = 0;

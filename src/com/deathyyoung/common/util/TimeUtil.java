@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 
 /**
  * @author <a href="#" target="_blank">Deathy Young</a> (<a
- *         href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class TimeUtil {

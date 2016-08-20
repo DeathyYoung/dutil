@@ -17,7 +17,7 @@ import com.deathyyoung.hibernate.dao.DbDao;
  * 数据库操作的实现类
  * 
  * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  */
 public class DbDaoBean implements DbDao {
 

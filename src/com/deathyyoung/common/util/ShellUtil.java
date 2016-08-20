@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * 
  * @author <a href="http://clog.deathyyoung.com" target="_blank">Deathy
- *         Young</a> (<a href="mailto:mapleyeh@qq.com" >mapleyeh@qq.com</a>)
+ *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  */
 public class ShellUtil {
 
