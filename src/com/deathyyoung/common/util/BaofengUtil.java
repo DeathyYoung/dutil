@@ -19,9 +19,11 @@ public class BaofengUtil {
 			}
 		} else if (file.isFile()) {
 			String fileName = file.getAbsolutePath();
-			String newname = fileName.split("(_baofeng)?.mp4")[0] + ".mp4";
-			File newfile = new File(newname);
-			file.renameTo(newfile);
+			if (fileName.contains("_baofeng")) {
+				String newname = fileName.split("(_baofeng)?.mp4")[0] + ".mp4";
+				File newfile = new File(newname);
+				file.renameTo(newfile);
+			}
 		}
 	}
 }

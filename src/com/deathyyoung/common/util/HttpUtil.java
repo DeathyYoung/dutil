@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
@@ -28,8 +31,7 @@ public class HttpUtil {
 	static {
 		pro = new Properties();
 		try {
-			InputStream in = HttpUtil.class
-					.getResourceAsStream("mime.properties");
+			InputStream in = HttpUtil.class.getResourceAsStream("mime.properties");
 			pro.load(in);
 		} catch (IOException e) {
 			System.out.println("未找到mime的配置文件！！！");
@@ -38,11 +40,11 @@ public class HttpUtil {
 
 	/**
 	 * <p>
-	 * get mime type
+	 * 获取资源文件的媒体类型
 	 *
 	 * @param extension
-	 *            file extension
-	 * @return mime type
+	 *            文件后缀
+	 * @return 媒体类型
 	 */
 	public static String getMIMEType(String extension) {
 		extension = extension.toLowerCase();
@@ -52,11 +54,11 @@ public class HttpUtil {
 
 	/**
 	 * <p>
-	 * get http content-type
+	 * 获取HTTP的内容类型
 	 *
 	 * @param extension
-	 *            file extension
-	 * @return http content-type
+	 *            文件后缀
+	 * @return 内容类型
 	 */
 	public static String getHTTPContentType(String extension) {
 		return getMIMEType(extension);
@@ -64,9 +66,11 @@ public class HttpUtil {
 
 	/**
 	 * <p>
-	 * get method
+	 * GET方法访问URL，返回String结果
 	 *
 	 * @param url
+	 *            访问地址
+	 * @return String结果
 	 */
 	public static String get(String url) {
 		return get(url, null);
@@ -74,20 +78,42 @@ public class HttpUtil {
 
 	/**
 	 * <p>
-	 * get method
+	 * GET方法访问URL，返回String结果
 	 *
 	 * @param url
-	 * @param map
+	 *            访问地址
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @return String结果
 	 */
-	public static String get(String url, Map<String, String> map) {
+	public static String get(String url, String proxyIP, int proxyPort) {
+		return get(url, null, proxyIP, proxyPort);
+	}
+
+	/**
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @return String结果
+	 */
+	public static String get(String url, Map<String, String> values, String proxyIP, int proxyPort) {
 		String result = "";
 		try {
 			StringBuffer sb = new StringBuffer();
 			sb.append(url);
-			if (map != null && map.size() > 0) {
+			if (values != null && values.size() > 0) {
 				sb.append('?');
-				Iterator<Entry<String, String>> iter = map.entrySet()
-						.iterator();
+				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
 				while (iter.hasNext()) {
 					Entry<String, String> entry = iter.next();
 					sb.append(entry.getKey());
@@ -98,12 +124,14 @@ public class HttpUtil {
 				sb.setLength(sb.length() - 1);
 			}
 			URL getUrl = new URL(sb.toString());
+
+			InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // http 代理
+
 			sb.setLength(0);
-			HttpURLConnection connection = (HttpURLConnection) getUrl
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection(proxy);
 			connection.connect();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String lines;
 			while ((lines = reader.readLine()) != null) {
 				sb.append(lines);
@@ -124,40 +152,110 @@ public class HttpUtil {
 	}
 
 	/**
-	 * @Description: post method
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param values
+	 *            传递参数
 	 * @param url
-	 * @return String
+	 *            访问地址
+	 * @return String结果
+	 */
+	public static String get(String url, Map<String, String> values) {
+		String result = "";
+		try {
+			StringBuffer sb = new StringBuffer();
+			sb.append(url);
+			if (values != null && values.size() > 0) {
+				sb.append('?');
+				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
+				while (iter.hasNext()) {
+					Entry<String, String> entry = iter.next();
+					sb.append(entry.getKey());
+					sb.append('=');
+					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+					sb.append('&');
+				}
+				sb.setLength(sb.length() - 1);
+			}
+			URL getUrl = new URL(sb.toString());
+			sb.setLength(0);
+			HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
+			connection.connect();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String lines;
+			while ((lines = reader.readLine()) != null) {
+				sb.append(lines);
+				sb.append('\n');
+			}
+			reader.close();
+			connection.disconnect();
+			result = sb.toString();
+			sb.setLength(0);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/**
+	 * <p>
+	 * POST方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @return String结果
 	 */
 	public static String post(String url) {
 		return post(url, null);
 	}
 
 	/**
-	 * @Description: post method
+	 * <p>
+	 * POST方法访问URL，返回String结果
+	 *
 	 * @param url
-	 * @param map
-	 * @return String
+	 *            访问地址
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @return String结果
 	 */
-	public static String post(String url, Map<String, String> map) {
+	public static String post(String url, String proxyIP, int proxyPort) {
+		return post(url, null, proxyIP, proxyPort);
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param values
+	 *            传递参数
+	 * @param url
+	 *            访问地址
+	 * @return String结果
+	 */
+	public static String post(String url, Map<String, String> values) {
 		String result = "";
 		try {
 			URL postUrl = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) postUrl
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
 			connection.setRequestMethod("POST");
 			connection.setUseCaches(false);
 			connection.setInstanceFollowRedirects(true);
-			connection.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			DataOutputStream out = new DataOutputStream(
-					connection.getOutputStream());
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			DataOutputStream out = new DataOutputStream(connection.getOutputStream());
 			StringBuffer sb = new StringBuffer();
-			if (map != null && map.size() > 0) {
+			if (values != null && values.size() > 0) {
 				sb.append('?');
-				Iterator<Entry<String, String>> iter = map.entrySet()
-						.iterator();
+				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
 				while (iter.hasNext()) {
 					Entry<String, String> entry = iter.next();
 					sb.append(entry.getKey());
@@ -171,8 +269,71 @@ public class HttpUtil {
 			sb.setLength(0);
 			out.flush();
 			out.close();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+				sb.append('\n');
+			}
+			reader.close();
+			connection.disconnect();
+			result = sb.toString();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param values
+	 *            传递参数
+	 * @param url
+	 *            访问地址
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @return String结果
+	 */
+	public static String post(String url, Map<String, String> values, String proxyIP, int proxyPort) {
+		String result = "";
+		try {
+			URL postUrl = new URL(url);
+
+			InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // http 代理
+
+			HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection(proxy);
+			connection.setDoOutput(true);
+			connection.setDoInput(true);
+			connection.setRequestMethod("POST");
+			connection.setUseCaches(false);
+			connection.setInstanceFollowRedirects(true);
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+			StringBuffer sb = new StringBuffer();
+			if (values != null && values.size() > 0) {
+				sb.append('?');
+				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
+				while (iter.hasNext()) {
+					Entry<String, String> entry = iter.next();
+					sb.append(entry.getKey());
+					sb.append('=');
+					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+					sb.append('&');
+				}
+				sb.setLength(sb.length() - 1);
+			}
+			out.writeBytes(sb.toString());
+			sb.setLength(0);
+			out.flush();
+			out.close();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				sb.append(line);

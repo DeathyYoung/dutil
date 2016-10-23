@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * @author <a href="#" target="_blank">Deathy Young</a> (<a
- *         href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a>
+ *         (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class TimeUtil {
@@ -264,8 +264,7 @@ public class TimeUtil {
 	 * @param dateFormatString
 	 * @return long
 	 */
-	public static long getInterval(String start, String end,
-			String dateFormatString) {
+	public static long getInterval(String start, String end, String dateFormatString) {
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormatString);
 		try {
 			Date startDate = sdf.parse(start);
@@ -283,8 +282,7 @@ public class TimeUtil {
 	 * @param dateFormatString
 	 * @return long
 	 */
-	public static long getIntervalBySecond(String start, String end,
-			String dateFormatString) {
+	public static long getIntervalBySecond(String start, String end, String dateFormatString) {
 		return getInterval(start, end, dateFormatString) / 1000;
 	}
 
@@ -363,8 +361,7 @@ public class TimeUtil {
 	 * @param endTime
 	 * @return int
 	 */
-	public static int getRangeByDay(String startTime, String endTime,
-			String pattern) {
+	public static int getRangeByDay(String startTime, String endTime, String pattern) {
 		Date start = TimeUtil.getDate(startTime, pattern);
 		Date end = TimeUtil.getDate(endTime, pattern);
 		long ms = end.getTime() - start.getTime();
@@ -425,8 +422,7 @@ public class TimeUtil {
 	 */
 	public static boolean isValidTime(String date) {
 		try {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			formatter.setLenient(false);
 			formatter.parse(date);
 			return true;
@@ -452,8 +448,7 @@ public class TimeUtil {
 			time = time.trim();
 			formatter = new SimpleDateFormat("yyyy.MM.dd G 'at' hh:mm:ss z");
 			if (tempPos > -1) {
-				time = time.substring(0, tempPos) + "公元"
-						+ time.substring(tempPos + "AD".length());// china
+				time = time.substring(0, tempPos) + "公元" + time.substring(tempPos + "AD".length());// china
 				formatter = new SimpleDateFormat("yyyy.MM.dd G 'at' hh:mm:ss z");
 			} else if ((time.indexOf(" ") < 0) && time.length() > 8) {
 				formatter = new SimpleDateFormat("yyyyMMddHHmmssZ");
@@ -466,17 +461,13 @@ public class TimeUtil {
 			} else if ((time.indexOf("\\") == 4) && (time.indexOf(" ") > -1)) {
 				formatter = new SimpleDateFormat("yyyy\\MM\\dd HH:mm:ss");
 
-			} else if ((time.indexOf("/") == 2) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("/") == 2) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("dd/MM/yyyy KK:mm:ss a");
-			} else if ((time.indexOf("/") == 4) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("/") == 4) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("yyyy/MM/dd KK:mm:ss a");
-			} else if ((time.indexOf("\\") == 2) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("\\") == 2) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("dd\\MM\\yyyy KK:mm:ss a");
-			} else if ((time.indexOf("\\") == 4) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("\\") == 4) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("yyyy\\MM\\dd KK:mm:ss a");
 
 			} else if ((time.indexOf("-") == 2) && (time.indexOf(" ") > -1)) {
@@ -484,11 +475,9 @@ public class TimeUtil {
 			} else if ((time.indexOf("-") == 4) && (time.indexOf(" ") > -1)) {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-			} else if ((time.indexOf("-") == 2) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("-") == 2) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("dd-MM-yyyy KK:mm:ss a");
-			} else if ((time.indexOf("-") == 4) && (time.indexOf("am") > -1)
-					|| (time.indexOf("pm") > -1)) {
+			} else if ((time.indexOf("-") == 4) && (time.indexOf("am") > -1) || (time.indexOf("pm") > -1)) {
 				formatter = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a");
 			}
 		} else {
@@ -648,8 +637,7 @@ public class TimeUtil {
 			DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 			DateFormat format2 = new SimpleDateFormat("HH:mm:ss");
 			DateFormat format3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			return format3.parse(format1.format(startDate) + " "
-					+ format2.format(time));
+			return format3.parse(format1.format(startDate) + " " + format2.format(time));
 		} catch (ParseException e) {
 			return null;
 		}
@@ -659,8 +647,7 @@ public class TimeUtil {
 	 * 计算两个日期相隔的天数
 	 */
 	public static int getDaysBetween(Date startDate, Date endDate) {
-		return Math
-				.abs((int) ((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)));
+		return Math.abs((int) ((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)));
 	}
 
 	/**
@@ -679,10 +666,8 @@ public class TimeUtil {
 			calendarEndDate = swap;
 		}
 
-		int months = calendarEndDate.get(Calendar.MONTH)
-				- calendarStartDate.get(Calendar.MONTH)
-				+ (calendarEndDate.get(Calendar.YEAR) - calendarStartDate
-						.get(Calendar.YEAR)) * 12;
+		int months = calendarEndDate.get(Calendar.MONTH) - calendarStartDate.get(Calendar.MONTH)
+				+ (calendarEndDate.get(Calendar.YEAR) - calendarStartDate.get(Calendar.YEAR)) * 12;
 
 		if (getEndDateByMonths(startDate, months).compareTo(endDate) < 0)
 			months += 1;
@@ -706,15 +691,11 @@ public class TimeUtil {
 			calendarEndDate = swap;
 		}
 
-		int years = calendarEndDate.get(Calendar.YEAR)
-				- calendarStartDate.get(Calendar.YEAR);
-		if (calendarEndDate.get(Calendar.MONTH) < calendarStartDate
-				.get(Calendar.MONTH)) {
+		int years = calendarEndDate.get(Calendar.YEAR) - calendarStartDate.get(Calendar.YEAR);
+		if (calendarEndDate.get(Calendar.MONTH) < calendarStartDate.get(Calendar.MONTH)) {
 			years = years - 1;
-		} else if (calendarEndDate.get(Calendar.MONTH) == calendarStartDate
-				.get(Calendar.MONTH)) {
-			if (calendarEndDate.get(Calendar.DAY_OF_MONTH) < calendarStartDate
-					.get(Calendar.DAY_OF_MONTH)) {
+		} else if (calendarEndDate.get(Calendar.MONTH) == calendarStartDate.get(Calendar.MONTH)) {
+			if (calendarEndDate.get(Calendar.DAY_OF_MONTH) < calendarStartDate.get(Calendar.DAY_OF_MONTH)) {
 				years = years - 1;
 			}
 		}
@@ -780,14 +761,11 @@ public class TimeUtil {
 			calendarEndDate = swap;
 		}
 
-		if (calendarStartDate.get(Calendar.DATE) == calendarEndDate
-				.get(Calendar.DATE))
+		if (calendarStartDate.get(Calendar.DATE) == calendarEndDate.get(Calendar.DATE))
 			return true;
 
-		if (calendarStartDate.get(Calendar.DATE) > calendarEndDate
-				.get(Calendar.DATE)) {
-			if (calendarEndDate.get(Calendar.DATE) == calendarEndDate
-					.getActualMaximum(Calendar.DATE))
+		if (calendarStartDate.get(Calendar.DATE) > calendarEndDate.get(Calendar.DATE)) {
+			if (calendarEndDate.get(Calendar.DATE) == calendarEndDate.getActualMaximum(Calendar.DATE))
 				return true;
 		}
 
@@ -806,8 +784,7 @@ public class TimeUtil {
 			return true;
 
 		if (calendar.get(Calendar.DATE) < day) {
-			if (calendar.get(Calendar.DATE) == calendar
-					.getActualMaximum(Calendar.DATE))
+			if (calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE))
 				return true;
 		}
 
@@ -828,10 +805,8 @@ public class TimeUtil {
 		calendarStartDate.setTime(startDate);
 		calendarEndDate.setTime(endDate);
 
-		if (calendarStartDate.get(Calendar.YEAR) == calendarEndDate
-				.get(Calendar.YEAR)
-				&& calendarStartDate.get(Calendar.MONTH) == calendarEndDate
-						.get(Calendar.MONTH))
+		if (calendarStartDate.get(Calendar.YEAR) == calendarEndDate.get(Calendar.YEAR)
+				&& calendarStartDate.get(Calendar.MONTH) == calendarEndDate.get(Calendar.MONTH))
 			return true;
 
 		return false;
@@ -863,8 +838,7 @@ public class TimeUtil {
 	 * 2004-20-20 to: 2004年20月20日
 	 */
 	public static String dateToNianYueRi(String strDate) {
-		return strDate.substring(0, 4).concat("年")
-				.concat(strDate.substring(5, 7)).concat("月")
+		return strDate.substring(0, 4).concat("年").concat(strDate.substring(5, 7)).concat("月")
 				.concat(strDate.substring(8, 10)).concat("日");
 	}
 
@@ -893,4 +867,40 @@ public class TimeUtil {
 		return preMonday;
 	}
 
+	/**
+	 * <p>
+	 * 将毫秒数转换为1d2h3m4s5ms的格式
+	 *
+	 * @param ms
+	 *            毫秒数
+	 * @return 可阅读的1d2h3m4s5ms格式字符串
+	 */
+	public static String showTime(long ms) {
+		StringBuffer sb = new StringBuffer();
+		long second = ms / 1000;
+		ms = ms % 1000;
+		long minite = second / 60;
+		second = second % 60;
+		sb.insert(0, "ms");
+		sb.insert(0, ms);
+		sb.insert(0, "s");
+		sb.insert(0, second);
+		if (minite > 0) {
+			long h = minite / 60;
+			minite = minite % 60;
+			sb.insert(0, "m");
+			sb.insert(0, minite);
+			if (h > 0) {
+				long d = h / 24;
+				h = h % 24;
+				sb.insert(0, "h");
+				sb.insert(0, h);
+				if (d > 0) {
+					sb.insert(0, "d");
+					sb.insert(0, d);
+				}
+			}
+		}
+		return sb.toString();
+	}
 }

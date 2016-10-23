@@ -28,9 +28,9 @@
 
 		<!-- 如果一个线程活动时间超过这个数值，线程会被杀死。 所以要确保这个数值设置得比最慢的响应时间长。默认是5分钟。 守护进程会把连接池中多余的可用线程（未用的、超过这个时间的）杀死， 
 			最终保留的连接数量就是minimum-connection-count规定的数量。 守护进程会根据house-keeping-sleep-time参数设置的时间隔定时检查。 -->
-		<maximum-active-time>300000</maximum-active-time>
+		<maximum-active-time>900000</maximum-active-time>
 		<!-- 指一个连接最大的存活时间（毫秒为单位），超过这个时间，连接会被杀死。默认值是4小时。 -->
-		<maximum-connection-lifetime>1800000</maximum-connection-lifetime>
+		<maximum-connection-lifetime>18000000</maximum-connection-lifetime>
 		<!-- 这个参数帮助我们确定连接池的状态，如果在这个时间阀值内（单位为毫秒）拒绝了一个连接，就认为是过载了。默认值是60。 -->
 		<overload-without-refusal-lifetime>60</overload-without-refusal-lifetime>
 		<!-- house keeper 保留线程处于睡眠状态的最长时间,house keeper 的职责就是检查各个连接的状态,并判断是否需要销毁或者创建。 
