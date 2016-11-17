@@ -1,10 +1,8 @@
 package com.deathyyoung.common.util;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -17,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @ClassName: HttpUtil
@@ -65,7 +64,7 @@ public class HttpUtil {
 	}
 
 	/**
-	 * <p>
+	 * 
 	 * GET方法访问URL，返回String结果
 	 *
 	 * @param url
@@ -73,11 +72,25 @@ public class HttpUtil {
 	 * @return String结果
 	 */
 	public static String get(String url) {
-		return get(url, null);
+		return get(url, null, null, null, "UTF-8");
 	}
 
 	/**
-	 * <p>
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String get(String url, String sendEncode) {
+		return get(url, null, null, null, sendEncode);
+	}
+
+	/**
+	 * 
 	 * GET方法访问URL，返回String结果
 	 *
 	 * @param url
@@ -88,8 +101,56 @@ public class HttpUtil {
 	 *            代理端口
 	 * @return String结果
 	 */
-	public static String get(String url, String proxyIP, int proxyPort) {
-		return get(url, null, proxyIP, proxyPort);
+	public static String get(String url, String proxyIP, Integer proxyPort) {
+		return get(url, null, proxyIP, proxyPort, "UTF-8");
+	}
+
+	/**
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String get(String url, String proxyIP, Integer proxyPort, String sendEncode) {
+		return get(url, null, proxyIP, proxyPort, sendEncode);
+	}
+
+	/**
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @return String结果
+	 */
+	public static String get(String url, Map<String, String> values) {
+		return get(url, values, null, null, "UTF-8");
+	}
+
+	/**
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String get(String url, Map<String, String> values, String sendEncode) {
+		return get(url, values, null, null, sendEncode);
 	}
 
 	/**
@@ -106,7 +167,28 @@ public class HttpUtil {
 	 *            代理端口
 	 * @return String结果
 	 */
-	public static String get(String url, Map<String, String> values, String proxyIP, int proxyPort) {
+	public static String get(String url, Map<String, String> values, String proxyIP, Integer proxyPort) {
+		return get(url, values, proxyIP, proxyPort, "UTF-8");
+	}
+
+	/**
+	 * 
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String get(String url, Map<String, String> values, String proxyIP, Integer proxyPort,
+			String sendEncode) {
 		String result = "";
 		try {
 			StringBuffer sb = new StringBuffer();
@@ -118,29 +200,37 @@ public class HttpUtil {
 					Entry<String, String> entry = iter.next();
 					sb.append(entry.getKey());
 					sb.append('=');
-					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+					sb.append(URLEncoder.encode(entry.getValue(), sendEncode));
 					sb.append('&');
 				}
 				sb.setLength(sb.length() - 1);
 			}
 			URL getUrl = new URL(sb.toString());
 
-			InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // http 代理
+			HttpURLConnection connection = null;
 
-			sb.setLength(0);
-			HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection(proxy);
-			connection.connect();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String lines;
-			while ((lines = reader.readLine()) != null) {
-				sb.append(lines);
-				sb.append('\n');
+			if (proxyIP != null && proxyPort != null) {
+				InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // 代理
+				connection = (HttpURLConnection) getUrl.openConnection(proxy);
+			} else {
+				connection = (HttpURLConnection) getUrl.openConnection();
 			}
-			reader.close();
+
+			connection.connect();
+
+			InputStream is = connection.getInputStream();
+
+			if (connection.getContentEncoding() != null && connection.getContentEncoding().contains("gzip")) {// 判断是否gzip压缩
+				GZIPInputStream gzis = new GZIPInputStream(is);// InputStream转换为GZIPInputStream
+				byte[] bytes = IOUtil.inputStreamToByte(gzis);
+				result = StringUtil.bytesToString(bytes);
+			} else {
+				byte[] bytes = IOUtil.inputStreamToByte(is);
+				result = StringUtil.bytesToString(bytes);
+			}
+
 			connection.disconnect();
-			result = sb.toString();
-			sb.setLength(0);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
@@ -154,69 +244,32 @@ public class HttpUtil {
 	/**
 	 * <p>
 	 * GET方法访问URL，返回String结果
-	 *
-	 * @param values
-	 *            传递参数
-	 * @param url
-	 *            访问地址
-	 * @return String结果
-	 */
-	public static String get(String url, Map<String, String> values) {
-		String result = "";
-		try {
-			StringBuffer sb = new StringBuffer();
-			sb.append(url);
-			if (values != null && values.size() > 0) {
-				sb.append('?');
-				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
-				while (iter.hasNext()) {
-					Entry<String, String> entry = iter.next();
-					sb.append(entry.getKey());
-					sb.append('=');
-					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-					sb.append('&');
-				}
-				sb.setLength(sb.length() - 1);
-			}
-			URL getUrl = new URL(sb.toString());
-			sb.setLength(0);
-			HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
-			connection.connect();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String lines;
-			while ((lines = reader.readLine()) != null) {
-				sb.append(lines);
-				sb.append('\n');
-			}
-			reader.close();
-			connection.disconnect();
-			result = sb.toString();
-			sb.setLength(0);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	/**
-	 * <p>
-	 * POST方法访问URL，返回String结果
 	 *
 	 * @param url
 	 *            访问地址
 	 * @return String结果
 	 */
 	public static String post(String url) {
-		return post(url, null);
+		return post(url, null, null, null, "UTF-8");
 	}
 
 	/**
 	 * <p>
-	 * POST方法访问URL，返回String结果
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String post(String url, String sendEncode) {
+		return post(url, null, null, null, sendEncode);
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
 	 *
 	 * @param url
 	 *            访问地址
@@ -226,89 +279,108 @@ public class HttpUtil {
 	 *            代理端口
 	 * @return String结果
 	 */
-	public static String post(String url, String proxyIP, int proxyPort) {
-		return post(url, null, proxyIP, proxyPort);
+	public static String post(String url, String proxyIP, Integer proxyPort) {
+		return post(url, null, proxyIP, proxyPort, "UTF-8");
 	}
 
 	/**
 	 * <p>
 	 * GET方法访问URL，返回String结果
 	 *
-	 * @param values
-	 *            传递参数
 	 * @param url
 	 *            访问地址
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String post(String url, String proxyIP, Integer proxyPort, String sendEncode) {
+		return post(url, null, proxyIP, proxyPort, sendEncode);
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
 	 * @return String结果
 	 */
 	public static String post(String url, Map<String, String> values) {
-		String result = "";
-		try {
-			URL postUrl = new URL(url);
-			HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-			connection.setDoOutput(true);
-			connection.setDoInput(true);
-			connection.setRequestMethod("POST");
-			connection.setUseCaches(false);
-			connection.setInstanceFollowRedirects(true);
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-			StringBuffer sb = new StringBuffer();
-			if (values != null && values.size() > 0) {
-				sb.append('?');
-				Iterator<Entry<String, String>> iter = values.entrySet().iterator();
-				while (iter.hasNext()) {
-					Entry<String, String> entry = iter.next();
-					sb.append(entry.getKey());
-					sb.append('=');
-					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-					sb.append('&');
-				}
-				sb.setLength(sb.length() - 1);
-			}
-			out.writeBytes(sb.toString());
-			sb.setLength(0);
-			out.flush();
-			out.close();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line);
-				sb.append('\n');
-			}
-			reader.close();
-			connection.disconnect();
-			result = sb.toString();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return result;
+		return post(url, values, null, null, "UTF-8");
 	}
 
 	/**
 	 * <p>
 	 * GET方法访问URL，返回String结果
 	 *
-	 * @param values
-	 *            传递参数
 	 * @param url
 	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String post(String url, Map<String, String> values, String sendEncode) {
+		return post(url, values, null, null, sendEncode);
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
 	 * @param proxyIP
 	 *            代理IP
 	 * @param proxyPort
 	 *            代理端口
 	 * @return String结果
 	 */
-	public static String post(String url, Map<String, String> values, String proxyIP, int proxyPort) {
+	public static String post(String url, Map<String, String> values, String proxyIP, Integer proxyPort) {
+		return post(url, values, proxyIP, proxyPort, "UTF-8");
+	}
+
+	/**
+	 * <p>
+	 * GET方法访问URL，返回String结果
+	 *
+	 * @param url
+	 *            访问地址
+	 * @param values
+	 *            传递参数
+	 * @param proxyIP
+	 *            代理IP
+	 * @param proxyPort
+	 *            代理端口
+	 * @param sendEncode
+	 *            发送数据时用的编码
+	 * @return String结果
+	 */
+	public static String post(String url, Map<String, String> values, String proxyIP, Integer proxyPort,
+			String sendEncode) {
 		String result = "";
 		try {
 			URL postUrl = new URL(url);
 
-			InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // http 代理
+			HttpURLConnection connection = null;
 
-			HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection(proxy);
+			if (proxyIP != null && proxyPort != null) {
+				InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(proxyIP), proxyPort);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddress); // 代理
+				connection = (HttpURLConnection) postUrl.openConnection(proxy);
+			} else {
+				connection = (HttpURLConnection) postUrl.openConnection();
+			}
+
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
 			connection.setRequestMethod("POST");
@@ -324,7 +396,7 @@ public class HttpUtil {
 					Entry<String, String> entry = iter.next();
 					sb.append(entry.getKey());
 					sb.append('=');
-					sb.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+					sb.append(URLEncoder.encode(entry.getValue(), sendEncode));
 					sb.append('&');
 				}
 				sb.setLength(sb.length() - 1);
@@ -333,15 +405,21 @@ public class HttpUtil {
 			sb.setLength(0);
 			out.flush();
 			out.close();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line);
-				sb.append('\n');
+
+			connection.connect();
+
+			InputStream is = connection.getInputStream();
+
+			if (connection.getContentEncoding() != null && connection.getContentEncoding().contains("gzip")) {// 判断是否gzip压缩
+				GZIPInputStream gzis = new GZIPInputStream(is);// InputStream转换为GZIPInputStream
+				byte[] bytes = IOUtil.inputStreamToByte(gzis);
+				result = StringUtil.bytesToString(bytes);
+			} else {
+				byte[] bytes = IOUtil.inputStreamToByte(is);
+				result = StringUtil.bytesToString(bytes);
 			}
-			reader.close();
+
 			connection.disconnect();
-			result = sb.toString();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -356,6 +434,7 @@ public class HttpUtil {
 	 * @param userAgent
 	 *            http请求的UserAgent
 	 * @return 如果是手机返回true，否则返回false
+	 * @deprecated
 	 */
 	public static boolean choose(String userAgent) {
 		if (userAgent.indexOf("Noki") > -1 || // Nokia phones and emulators

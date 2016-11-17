@@ -15,8 +15,8 @@ import org.jsoup.parser.Tag;
  * <p>
  * Need jsoup-1.8.1.jar.
  * 
- * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a>
+ *         (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Mar 2, 2015
  */
 public class HtmlUtil {
@@ -77,8 +77,7 @@ public class HtmlUtil {
 					dest.appendChild(destText);
 					break;
 				} else {
-					TextNode destText = new TextNode(sourceText.getWholeText(),
-							sourceChild.baseUri());
+					TextNode destText = new TextNode(sourceText.getWholeText(), sourceChild.baseUri());
 					dest.appendChild(destText);
 				}
 			}
@@ -95,8 +94,7 @@ public class HtmlUtil {
 	private static Element createSafeElement(Element sourceEl) {
 		String sourceTag = sourceEl.tagName();
 		Attributes destAttrs = new Attributes();
-		Element dest = new Element(Tag.valueOf(sourceTag), sourceEl.baseUri(),
-				destAttrs);
+		Element dest = new Element(Tag.valueOf(sourceTag), sourceEl.baseUri(), destAttrs);
 		Attributes sourceAttrs = sourceEl.attributes();
 		for (Attribute sourceAttr : sourceAttrs) {
 			destAttrs.put(sourceAttr);

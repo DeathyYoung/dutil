@@ -6,8 +6,8 @@ import java.util.List;
 
 /**
  * 
- * @author <a href="#" target="_blank">Deathy
- *         Young</a> (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a>
+ *         (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Jun 16, 2015
  */
 public class StringUtil {
@@ -95,8 +95,7 @@ public class StringUtil {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < chars.length; i++) {
 			sb.append(chars[i]);
-			if (chars[i] == '.' && i + 2 < chars.length
-					&& RegexUtil.matches(chars[i + 1], "\\W")) {
+			if (chars[i] == '.' && i + 2 < chars.length && RegexUtil.matches(chars[i + 1], "\\W")) {
 				strlist.add(sb.toString());
 				sb.setLength(0);
 			}
@@ -134,8 +133,8 @@ public class StringUtil {
 	 * @return the encode
 	 */
 	public static String getEncoding(String str) {
-		String[] encodes = { "UTF-8", "GBK", "US-ASCII", "ISO-8859-1",
-				"UTF-16BE", "UTF-16LE", "UTF-16", "GB2312", "GB18030" };
+		String[] encodes = { "UTF-8", "GBK", "US-ASCII", "ISO-8859-1", "UTF-16BE", "UTF-16LE", "UTF-16", "GB2312",
+				"GB18030" };
 		for (String encode : encodes) {
 			try {
 				if (str.equals(new String(str.getBytes(encode), encode))) {
@@ -185,5 +184,48 @@ public class StringUtil {
 			}
 		}
 		return true;
+	}
+
+	public static String bytesToString(byte[] bytes, String encode) {
+		String str = "";
+		try {
+			str = new String(bytes, encode);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return str;
+	}
+
+	public static String bytesToString(byte[] bytes) {
+		return bytesToString(bytes, getEncoding(bytes));
+	}
+
+	public static String getEncoding(byte[] bytes) {
+		String code = "";
+		if (bytes[0] == -1 && bytes[1] == -2) {
+			code = "UTF-16";
+		} else if (bytes[0] == -2 && bytes[1] == -1) {
+			code = "UTF-16";
+		} else if (bytes[0] == -17 && bytes[1] == -69 && bytes[2] == -65) {
+			code = "UTF-8";
+		} else if ("Unicode".equals(code)) {
+			code = "UTF-16";
+		}
+		if (code.length() == 0) {
+			int index = 0;
+			for (; index + 3 < bytes.length; index++) {
+				if (bytes[index] < 0) {
+					break;
+				}
+			}
+			byte[] charBytes = new byte[] { bytes[index], bytes[index + 1], bytes[index + 2] };
+
+			if ((charBytes[0] & 0xF0) == 0xE0 && (charBytes[1] & 0xC0) == 0x80 && (charBytes[2] & 0xC0) == 0x80) {// 无BOM的UTF-8
+				code = "UTF-8";
+			} else {
+				code = "GBK";
+			}
+		}
+		return code;
 	}
 }

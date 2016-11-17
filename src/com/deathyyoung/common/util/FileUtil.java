@@ -22,8 +22,8 @@ import java.util.Set;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * @author <a href="#" target="_blank">Deathy Young</a> (<a
- *         href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
+ * @author <a href="#" target="_blank">Deathy Young</a>
+ *         (<a href="mailto:deathyyoung@qq.com" >deathyyoung@qq.com</a>)
  * @since Feb 24, 2015
  */
 public class FileUtil {
@@ -44,8 +44,7 @@ public class FileUtil {
 	public final static byte[] BOM = { -17, -69, -65 };
 
 	static {
-		String osName = System.getProperties().getProperty("os.name")
-				.toLowerCase();
+		String osName = System.getProperties().getProperty("os.name").toLowerCase();
 		isWindows = false;
 		if (osName.contains("windows")) {
 			isWindows = true;
@@ -122,8 +121,7 @@ public class FileUtil {
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String[] contents, int beginIndex,
-			int endIndex, String path) {
+	public static boolean addToFile(String[] contents, int beginIndex, int endIndex, String path) {
 		if (!validPath(path))
 			return false;
 		File targetFile = new File(path);
@@ -163,8 +161,7 @@ public class FileUtil {
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFileln(String[] contents, int beginIndex,
-			int endIndex, String path) {
+	public static boolean addToFileln(String[] contents, int beginIndex, int endIndex, String path) {
 		if (!validPath(path))
 			return false;
 		File targetFile = new File(path);
@@ -187,8 +184,7 @@ public class FileUtil {
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFile(String[] contents, int beginIndex,
-			int endIndex, File file) {
+	public static boolean addToFile(String[] contents, int beginIndex, int endIndex, File file) {
 		FileWriter fw = null;
 		try {
 			beginIndex = beginIndex < 0 ? 0 : beginIndex;
@@ -322,8 +318,7 @@ public class FileUtil {
 	 *         to the file;<br>
 	 *         <code>false</code> otherwise
 	 */
-	public static boolean addToFileln(String[] contents, int beginIndex,
-			int endIndex, File file) {
+	public static boolean addToFileln(String[] contents, int beginIndex, int endIndex, File file) {
 		FileWriter fw = null;
 		try {
 			if (!file.exists())
@@ -425,8 +420,7 @@ public class FileUtil {
 		BufferedReader br = null;
 		try {
 			String charset = getCharset(textFile);
-			reader = new InputStreamReader(new FileInputStream(textFile),
-					charset);
+			reader = new InputStreamReader(new FileInputStream(textFile), charset);
 			br = new BufferedReader(reader);
 			br.skip(beginIndex);
 			int charSize = 1024;
@@ -504,8 +498,7 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean createNewFileForce(File file, int fileLength) {
-		if (!mkdir(file.getAbsolutePath().substring(0,
-				file.getAbsolutePath().lastIndexOf(File.separatorChar)))) {
+		if (!mkdir(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separatorChar)))) {
 			return false;
 		}
 		if (file.exists()) {
@@ -725,7 +718,7 @@ public class FileUtil {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean mkdir(File dir) {
-		return mkdir(dir.getAbsoluteFile());
+		return mkdir(dir.getAbsolutePath());
 	}
 
 	/**
@@ -767,13 +760,10 @@ public class FileUtil {
 		File[] file = srcDir.listFiles();
 		for (int i = 0; i < file.length; i++) {
 			if (file[i].isFile()) {
-				copyFile(file[i], new File(destDir.getAbsoluteFile()
-						+ File.separator + file[i].getName()));
+				copyFile(file[i], new File(destDir.getAbsoluteFile() + File.separator + file[i].getName()));
 			} else if (file[i].isDirectory()) {
-				String srcSubDir = srcDir.getAbsoluteFile() + File.separator
-						+ file[i].getName();
-				String destSubDir = destDir.getAbsoluteFile() + File.separator
-						+ file[i].getName();
+				String srcSubDir = srcDir.getAbsoluteFile() + File.separator + file[i].getName();
+				String destSubDir = destDir.getAbsoluteFile() + File.separator + file[i].getName();
 				if (!copyDirectiory(srcSubDir, destSubDir))
 					return false;
 			}
@@ -837,13 +827,10 @@ public class FileUtil {
 		File[] file = src.listFiles();
 		for (int i = 0; i < file.length; i++) {
 			if (file[i].isFile()) {
-				copyFile(file[i], new File(dest.getAbsoluteFile()
-						+ File.separator + file[i].getName()));
+				copyFile(file[i], new File(dest.getAbsoluteFile() + File.separator + file[i].getName()));
 			} else if (file[i].isDirectory()) {
-				String srcSubDir = src.getAbsoluteFile() + File.separator
-						+ file[i].getName();
-				String destSubDir = dest.getAbsoluteFile() + File.separator
-						+ file[i].getName();
+				String srcSubDir = src.getAbsoluteFile() + File.separator + file[i].getName();
+				String destSubDir = dest.getAbsoluteFile() + File.separator + file[i].getName();
 				if (!copyDirectiory(srcSubDir, destSubDir))
 					return false;
 			}
@@ -1126,8 +1113,7 @@ public class FileUtil {
 	 *            the ending line index, exclusive
 	 * @return the specified array
 	 */
-	private static String[] getLines(BufferedReader br, int beginIndex,
-			int endIndex) {
+	private static String[] getLines(BufferedReader br, int beginIndex, int endIndex) {
 		String[] strs = new String[endIndex - beginIndex];
 		skipLine(br, beginIndex - 1);
 		for (int i = 0; i < endIndex - beginIndex; i++) {
@@ -1292,65 +1278,78 @@ public class FileUtil {
 		if (file == null || !file.exists())
 			return code;
 		try {
-			FileInputStream in = new FileInputStream(file);
-			byte[] head = new byte[3];
-			try {
-				in.read(head);
-				code = "";
-				if (head[0] == -1 && head[1] == -2) {
-					code = "UTF-16";
-				} else if (head[0] == -2 && head[1] == -1) {
-					code = "UTF-16";
-				} else if (head[0] == -17 && head[1] == -69 && head[2] == -65) {
-					code = "UTF-8";
-				} else if ("Unicode".equals(code)) {
-					code = "UTF-16";
-				}
-				if (code.length() == 0) {
-					int index = 0;
-					for (; index < head.length; index++) {
-						if (head[index] < 0) {
-							break;
-						}
-					}
-					byte[] charBytes = new byte[] { 0, 0, 0 };
-					switch (index) {
-					case 0:
-						charBytes[0] = head[0];
-						charBytes[1] = head[1];
-						charBytes[2] = head[2];
-						break;
-					case 1:
-						charBytes[0] = head[1];
-						charBytes[1] = head[2];
-						charBytes[2] = (byte) in.read();
-						break;
-					case 2:
-						charBytes[0] = head[2];
-						charBytes[1] = (byte) in.read();
-						charBytes[2] = (byte) in.read();
-						break;
-					default:
-						while ((charBytes[0] = (byte) in.read()) >= 0)
-							;
-						charBytes[1] = (byte) in.read();
-						charBytes[2] = (byte) in.read();
-						break;
-					}
-					if ((charBytes[0] & 0xF0) == 0xE0
-							&& (charBytes[1] & 0xC0) == 0x80
-							&& (charBytes[2] & 0xC0) == 0x80) {// 无BOM的UTF-8
-						code = "UTF-8";
-					} else {
-						code = "GBK";
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			in.close();
+			InputStream is = new FileInputStream(file);
+			String charset = getCharset(is);
+			is.close();
+			return charset;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return code;
+	}
+
+	/**
+	 * <p>
+	 * get the input stream's charset
+	 *
+	 * @param in
+	 *            the input stream
+	 * @return charset
+	 */
+	public static String getCharset(InputStream in) {
+		String code = "";
+		byte[] head = new byte[3];
+		try {
+			in.read(head);
+			code = "";
+			if (head[0] == -1 && head[1] == -2) {
+				code = "UTF-16";
+			} else if (head[0] == -2 && head[1] == -1) {
+				code = "UTF-16";
+			} else if (head[0] == -17 && head[1] == -69 && head[2] == -65) {
+				code = "UTF-8";
+			} else if ("Unicode".equals(code)) {
+				code = "UTF-16";
+			}
+			if (code.length() == 0) {
+				int index = 0;
+				for (; index < head.length; index++) {
+					if (head[index] < 0) {
+						break;
+					}
+				}
+				byte[] charBytes = new byte[] { 0, 0, 0 };
+				switch (index) {
+				case 0:
+					charBytes[0] = head[0];
+					charBytes[1] = head[1];
+					charBytes[2] = head[2];
+					break;
+				case 1:
+					charBytes[0] = head[1];
+					charBytes[1] = head[2];
+					charBytes[2] = (byte) in.read();
+					break;
+				case 2:
+					charBytes[0] = head[2];
+					charBytes[1] = (byte) in.read();
+					charBytes[2] = (byte) in.read();
+					break;
+				default:
+					while ((charBytes[0] = (byte) in.read()) >= 0)
+						;
+					charBytes[1] = (byte) in.read();
+					charBytes[2] = (byte) in.read();
+					break;
+				}
+				if ((charBytes[0] & 0xF0) == 0xE0 && (charBytes[1] & 0xC0) == 0x80 && (charBytes[2] & 0xC0) == 0x80) {// 无BOM的UTF-8
+					code = "UTF-8";
+				} else {
+					code = "GBK";
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1481,8 +1480,7 @@ public class FileUtil {
 	 * @param suffixes
 	 *            指定后缀
 	 */
-	private static void changeEncode(String path, CHARSET charset,
-			String... suffixes) {
+	private static void changeEncode(String path, CHARSET charset, String... suffixes) {
 		File file = new File(path);
 		if (file.exists()) {
 			if (file.isFile()) {
@@ -1505,8 +1503,7 @@ public class FileUtil {
 		FileUtil.addToFile(sb.toString(), file);
 	}
 
-	private static void changeEncodeFile(File file, CHARSET charset,
-			String... suffixes) {
+	private static void changeEncodeFile(File file, CHARSET charset, String... suffixes) {
 		boolean flag = false;
 		if (suffixes.length == 0) {
 			flag = true;
@@ -1528,8 +1525,7 @@ public class FileUtil {
 		}
 	}
 
-	private static void changeEncodeDir(File file, CHARSET charset,
-			String... suffixes) {
+	private static void changeEncodeDir(File file, CHARSET charset, String... suffixes) {
 		File[] files = file.listFiles();
 		Set<String> suffixSet = new LinkedHashSet<String>();
 		for (String suffix : suffixes) {
