@@ -21,6 +21,8 @@ import java.util.Properties;
 import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 
+import com.deathyyoung.common.util.ExceptionUtil;
+import com.deathyyoung.common.util.FileUtil;
 import com.deathyyoung.common.util.SecurityUtil;
 import com.deathyyoung.jdbc.factory.JDBCFactory;
 
@@ -89,33 +91,27 @@ public class JDBCUtil {
 
 	/** 指定超时时间，单位：秒。超过该时间后如果链接满了，会销毁超时的空闲链接 */
 	private static int overtime;
-	/**
-	 * <p>
-	 * 数据库配置项的名字
-	 *
-	 */
+
+	/** 指定超时时间，单位：秒。超过该时间后如果不能确定连接有效，则会认为连接失效 */
+	private static int validTimeout;
+	/** 数据库配置项的名字 */
 	private String alias;
-	/**
-	 * <p>
-	 * 数据库连接
-	 *
-	 */
+	/** 数据库连接 */
 	private Connection conn;
-	/** 重试次数 */
-	private int retryCount;
 	/** 连接满 */
 	private boolean connectionFull;
 	/** 语句数量。如果数量为0则新建连接；如果数量 > 0，不关闭连接；如果减少至0，再释放连接 */
 	private int statementNum;
-	/**
-	 * <p>
-	 * C3P0工具类
-	 *
-	 */
+	/** C3P0工具类 */
 	private C3P0Util cu;
-
-	/** 重连次数 */
-	private static final int RETRY_COUNT = 10;
+	/** 当前conn连接重连次数 */
+	private int retryConnCount;
+	/** 连接是否关闭 */
+	private boolean connClose;
+	/** sql执行尝试次数 */
+	private static final int RETRY_COUNT = 3;
+	/** conn连接重连次数 */
+	private static final int RETRY_CONN_COUNT = 10;
 
 	/** 重连等待时间，单位毫秒 */
 	private static final int WAITING_RECONNECT_TIME = 10000;
@@ -130,7 +126,15 @@ public class JDBCUtil {
 		}
 		pool = POOL.valueOf(pro.getProperty("pool"));
 
+		
 		{// @deprecated
+			String validTimeoutStr = pro.getProperty("validTimeout");
+			if (validTimeoutStr != null && validTimeoutStr.trim().length() > 0) {
+				validTimeoutStr = validTimeoutStr.trim();
+				if (validTimeoutStr.matches("[0-9]+")) {
+					validTimeout = Integer.parseInt(validTimeoutStr);
+				}
+			}
 			String overtimeStr = pro.getProperty("overtime");
 			if (overtimeStr != null && overtimeStr.trim().length() > 0) {
 				overtimeStr = overtimeStr.trim();
@@ -164,7 +168,7 @@ public class JDBCUtil {
 					JAXPConfigurator.configure("bin/proxool.xml", false);
 				}
 			} catch (ProxoolException e) {
-				e.printStackTrace();
+				ExceptionUtil.log(e);
 			}
 			break;
 		case DBCP:
@@ -190,17 +194,12 @@ public class JDBCUtil {
 		case NONE:
 			break;
 		case C3P0:
-			System.out.println("使用C3P0连接池");
 			break;
 		case PROXOOL:
-			System.out.println("使用PROXOOL连接池");
 			break;
 		case DBCP:
-			System.out.println("使用DBCP连接池");
 		default:
 		}
-
-		open();
 	}
 
 	/**
@@ -209,47 +208,52 @@ public class JDBCUtil {
 	 *
 	 * @return 连接
 	 */
-	private Connection reOpen() {
-		retryCount--;
-		if (retryCount <= 0) {
-			try {
-				retryCount = RETRY_COUNT;
-				if (!connectionFull) {
+	private synchronized Connection reOpen() {
+		if (isConnValid()) {
+			return conn;
+		}
+
+		do {
+			if (connectionFull) {
+				try {
 					System.out.println("Connection full: waiting...");
+					// free();
+					Thread.sleep(WAITING_RECONNECT_TIME);
+				} catch (InterruptedException e) {
+					ExceptionUtil.log(e);
 				}
+			}
+
+			try {
+				switch (pool) {
+				case NONE:
+					Class.forName(driverPath);
+					conn = DriverManager.getConnection(url, user, password);
+					break;
+				case C3P0:
+					cu = new C3P0Util();
+					cu.openDataSource();
+					conn = cu.getDataSource().getConnection();
+					break;
+				case PROXOOL:
+					conn = DriverManager.getConnection("proxool." + alias);
+					break;
+				case DBCP:
+					conn = DBCPUtil.initDS(url, user, password, driverPath, initialSize, maxActive, maxIdle, maxWait)
+							.getConnection();
+					break;
+				default:
+				}
+				retryConnCount = 0;// 成功
+				connectionFull = false;
+				return conn;
+			} catch (SQLException e) {
 				connectionFull = true;
-				// free();
-				Thread.sleep(WAITING_RECONNECT_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				ExceptionUtil.log(e);
+			} catch (ClassNotFoundException e) {
+				ExceptionUtil.log(e);
 			}
-		}
-		try {
-			switch (pool) {
-			case NONE:
-				Class.forName(driverPath);
-				conn = DriverManager.getConnection(url, user, password);
-				break;
-			case C3P0:
-				cu = new C3P0Util();
-				cu.openDataSource();
-				conn = cu.getDataSource().getConnection();
-				break;
-			case PROXOOL:
-				conn = DriverManager.getConnection("proxool." + alias);
-				break;
-			case DBCP:
-				conn = DBCPUtil.initDS(url, user, password, driverPath, initialSize, maxActive, maxIdle, maxWait)
-						.getConnection();
-				break;
-			default:
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			reOpen();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		} while (--retryConnCount >= 0);
 		return conn;
 	}
 
@@ -260,18 +264,17 @@ public class JDBCUtil {
 	 * @return 连接
 	 */
 	private Connection open() {
-		retryCount = RETRY_COUNT;
-		try {
-			if (conn == null || conn.isClosed()) {
-				statementNum = 0;
-				conn = reOpen();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			statementNum = 0;
-			conn = reOpen();
-		}
 		statementNum++;
+		System.out.println("statementNum:"+statementNum);
+		if (!isConnValid()) {
+			retryConnCount = RETRY_CONN_COUNT;
+			conn = reOpen();
+			if (isConnValid()) {
+				connClose = true;
+			}
+		} else {
+			connClose = true;
+		}
 		return conn;
 	}
 
@@ -281,30 +284,15 @@ public class JDBCUtil {
 	 *
 	 */
 	private void close() {
+		statementNum--;
 		try {
-			statementNum--;
-			if (statementNum <= 0) {
-				statementNum = 0;
+			if (statementNum <= 0 && isConnValid()) {
 				conn.close();
+				connClose = true;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			ExceptionUtil.log(e);
 		}
-	}
-
-	/**
-	 * <p>
-	 * 判断连接是否关闭
-	 *
-	 * @return 连接是否关闭
-	 */
-	public boolean isConnClosed() {
-		try {
-			return conn.isClosed();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
 	}
 
 	/**
@@ -318,7 +306,8 @@ public class JDBCUtil {
 	 * @return 字段名称
 	 */
 	public String[] getColumnNames(String sql, Object... objs) {
-		String[] columnNames = null;
+		String[] columnNames = new String[0];
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -338,15 +327,14 @@ public class JDBCUtil {
 				}
 				rs.close();
 				pstmt.close();
-
-				retryCount = 0;
+				retryCount = 0;// 成功
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return columnNames;
 	}
 
@@ -361,10 +349,13 @@ public class JDBCUtil {
 	 * @return 字段类型
 	 */
 	public String[] getColumnTypes(String sql, Object... objs) {
-		String[] columnTypes = null;
+		String[] columnTypes = new String[0];
+
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
+
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				for (int i = 0; i < objs.length; i++) {
 					if (objs[i] != null && objs[i] instanceof java.lang.String) {
@@ -379,16 +370,19 @@ public class JDBCUtil {
 				for (int i = 0; i < columnTypes.length; i++) {
 					columnTypes[i] = rsmd.getColumnTypeName(i + 1);
 				}
+
 				rs.close();
 				pstmt.close();
-				retryCount = 0;
+				retryCount = 0;// 成功
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
+
 		return columnTypes;
 	}
 
@@ -402,18 +396,17 @@ public class JDBCUtil {
 	 */
 	public PreparedStatement prepareStatement(String sql) {
 		PreparedStatement pstmt = null;
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
 				pstmt = conn.prepareStatement(sql);
 				retryCount = 0;
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
-			} finally {
-				close();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return pstmt;
 	}
 
@@ -431,6 +424,7 @@ public class JDBCUtil {
 	 */
 	public boolean loadFromDatabase(String sql, String filePath, String blobColumnName, Object... objs) {
 		FileOutputStream output = null;
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -465,16 +459,19 @@ public class JDBCUtil {
 				}
 				rs.close();
 				pstmt.close();
-				retryCount = 0;
+				retryCount = 0;// 成功
 				return true;
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
 		} while (retryCount > 0);
@@ -503,8 +500,9 @@ public class JDBCUtil {
 	 *            参数值
 	 * @return 是否成功
 	 */
-	public synchronized boolean execute(String sql, Object... objs) {
+	public boolean execute(String sql, Object... objs) {
 		boolean line = false;
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -521,16 +519,18 @@ public class JDBCUtil {
 					pstmt.setObject(i + 1, objs[i]);
 				}
 				line = pstmt.execute();
-				retryCount = 0;
+				retryCount = 0;// 成功
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return line;
 	}
 
@@ -546,6 +546,7 @@ public class JDBCUtil {
 	 */
 	public LinkedList<Map<String, Object>> executeQuery(String sql, Object... objs) {
 		LinkedList<Map<String, Object>> aList = new LinkedList<Map<String, Object>>();
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -565,7 +566,6 @@ public class JDBCUtil {
 					columnNames[i] = rsmd.getColumnName(i + 1);
 					columnTypes[i] = rsmd.getColumnTypeName(i + 1);
 				}
-
 				while (rs.next()) {// 遍历结果集
 					Map<String, Object> rsMap = new HashMap<String, Object>();
 					for (int i = 0; i < columnCount; i++) {
@@ -595,12 +595,13 @@ public class JDBCUtil {
 				pstmt = null;
 				retryCount = 0;
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return aList;
 	}
 
@@ -627,6 +628,7 @@ public class JDBCUtil {
 	 * @return 是否成功
 	 */
 	private boolean freeSleepConn() {
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -651,12 +653,13 @@ public class JDBCUtil {
 				retryCount = 0;
 				executeBatch("kill ?", 1, ids);
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return true;
 	}
 
@@ -672,6 +675,7 @@ public class JDBCUtil {
 	 */
 	public LinkedList<String[]> executeQueryToStrings(String sql, Object... objs) {
 		LinkedList<String[]> aList = new LinkedList<String[]>();
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -700,14 +704,16 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return aList;
 	}
 
@@ -723,6 +729,7 @@ public class JDBCUtil {
 	 */
 	public int executeUpdate(String sql, Object... objs) {
 		int line = -1;
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -742,14 +749,15 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 			} finally {
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 		return line;
 	}
 
@@ -769,6 +777,7 @@ public class JDBCUtil {
 	 */
 	public synchronized int[] executeBatch(String sql, int valueNumber, LinkedList<Object> values) {
 		int[] lines = null;
+		int retryCount = RETRY_COUNT;
 		do {
 			try {
 				open();
@@ -788,22 +797,24 @@ public class JDBCUtil {
 				pstmt.close();
 				retryCount = 0;
 			} catch (SQLException e) {
-				e.printStackTrace();
-				retryCount--;
+				if (retryCount == 1)
+					ExceptionUtil.log(e);
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					ExceptionUtil.log(e1);
 				}
 			} finally {
 				try {
 					conn.setAutoCommit(true);
 				} catch (SQLException e) {
-					e.printStackTrace();
+					if (retryCount == 1)
+						ExceptionUtil.log(e);
 				}
+
 				close();
 			}
-		} while (retryCount > 0);
+		} while (--retryCount > 0);// retryCount=1时失败
 
 		return lines;
 	}
@@ -815,6 +826,16 @@ public class JDBCUtil {
 	 */
 	public boolean hasConn() {
 		return conn != null;
+	}
+
+	/**
+	 * <p>
+	 * TODO
+	 *
+	 * @return 判断连接是否可用
+	 */
+	public boolean isConnValid() {
+		return hasConn() && !connClose;
 	}
 
 }

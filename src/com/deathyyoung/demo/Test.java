@@ -1,18 +1,25 @@
 package com.deathyyoung.demo;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import com.deathyyoung.common.util.HttpUtil;
+import com.deathyyoung.common.util.ExceptionUtil;
 
 public class Test {
 
-	public static void main(String[] args) throws Exception {
-		Map<String, String> map = new LinkedHashMap<String, String>();
-		String url = "http://www.zju.edu.cn";
-		String rst = HttpUtil.get(url, map);
-		System.out.println(rst);
-		System.out.println("rst len:" + rst.length());
+	public static void d() {
+		int a = 1;
+		int b = 0;
+		System.out.println(a / b);
 	}
+
+	public static void main(String[] args) throws Exception {
+		try {
+			d();
+		} catch (java.lang.ArithmeticException e) {
+			System.out.println(ExceptionUtil.getInfo(e));
+			System.out.println("===================================");
+			e.printStackTrace();
+		}
+	}
+
+	
 
 }
