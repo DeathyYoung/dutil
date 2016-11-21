@@ -265,7 +265,6 @@ public class JDBCUtil {
 	 */
 	private Connection open() {
 		statementNum++;
-		System.out.println("statementNum:"+statementNum);
 		if (!isConnValid()) {
 			retryConnCount = RETRY_CONN_COUNT;
 			conn = reOpen();
