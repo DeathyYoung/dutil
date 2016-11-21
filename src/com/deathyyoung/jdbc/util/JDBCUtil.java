@@ -22,7 +22,6 @@ import org.logicalcobwebs.proxool.ProxoolException;
 import org.logicalcobwebs.proxool.configuration.JAXPConfigurator;
 
 import com.deathyyoung.common.util.ExceptionUtil;
-import com.deathyyoung.common.util.FileUtil;
 import com.deathyyoung.common.util.SecurityUtil;
 import com.deathyyoung.jdbc.factory.JDBCFactory;
 
@@ -93,6 +92,7 @@ public class JDBCUtil {
 	private static int overtime;
 
 	/** 指定超时时间，单位：秒。超过该时间后如果不能确定连接有效，则会认为连接失效 */
+	@SuppressWarnings("unused")
 	private static int validTimeout;
 	/** 数据库配置项的名字 */
 	private String alias;
